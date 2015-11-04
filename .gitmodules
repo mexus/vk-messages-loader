@@ -1,0 +1,6 @@
+[submodule "3rd-party/cpr"]
+	path = 3rd-party/cpr
+	url = git@github.com:whoshuu/cpr.git
+[submodule "3rd-party/rapidjson"]
+	path = 3rd-party/rapidjson
+	url = git@github.com:miloyip/rapidjson.git
