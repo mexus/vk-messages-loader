@@ -1,6 +1,6 @@
 #include <ctime>
 #include <iostream>
-#include <vk-api/api.h>
+#include <vk-api/communication-interface.h>
 
 std::string GetToken(const std::string& auto_url);
 
@@ -129,13 +129,12 @@ bool ProcessUser(const rapidjson::Value& user) {
 }
 
 int GetFriends(vk_api::CommunicationInterface* iface) {
-    vk_api::Request request;
-    request.method_name = "friends.get";
-    request.names_and_values["count"] = "5";
-    request.names_and_values["offset"] = "0";
-    request.names_and_values["fields"] = "uid,first_name,last_name";
-    request.names_and_values["order"] = "hints";
-    auto reply = iface->SendRequest(std::move(request));
+    cpr::Parameters params;
+    params.AddParameter({"count", "5"});
+    params.AddParameter({"offset", "0"});
+    params.AddParameter({"fields", "uid,first_name,last_name"});
+    params.AddParameter({"order", "hints"});
+    auto reply = iface->SendRequest("friends", "get", std::move(params));
     if (!reply) {
         std::cerr << "Can't get a response\n";
         return 1;
@@ -234,15 +233,12 @@ int GetMessages(vk_api::CommunicationInterface* iface) {
     std::cout << "Enter user id to retreive a message history: ";
     unsigned user_id;
     std::cin >> user_id;
-    vk_api::Request request;
-    request.method_name = "messages.getHistory";
-    request.names_and_values["offset"] = "0";
-    request.names_and_values["count"] = "5";
-    request.names_and_values["user_id"] = std::to_string(user_id);
-    request.names_and_values["rev"] = "0";
-
-
-    auto reply = iface->SendRequest(std::move(request));
+    cpr::Parameters params;
+    params.AddParameter({"offset", "0"});
+    params.AddParameter({"count", "5"});
+    params.AddParameter({"user_id", std::to_string(user_id)});
+    params.AddParameter({"rev", "0"});
+    auto reply = iface->SendRequest("messages", "getHistory", std::move(params));
     if (!reply) {
         std::cerr << "Can't get a response\n";
         return 1;
@@ -251,10 +247,14 @@ int GetMessages(vk_api::CommunicationInterface* iface) {
 }
 
 int main() {
+
+    vk_api::IntervalsManager intervals_manager;
+    vk_api::RequestsManager requests_manager(&intervals_manager);
+
     std::string client_id;
     std::cout << "Enter application id (client id): ";
     std::cin >> client_id;
-    vk_api::CommunicationInterface iface(client_id, GetToken);
+    vk_api::CommunicationInterface iface(client_id, GetToken, &requests_manager);
 
     return GetFriends(&iface) | GetMessages(&iface);
 }
