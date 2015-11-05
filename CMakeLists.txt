@@ -18,3 +18,4 @@ include_directories(${CPR_INCLUDE_DIRS})
 message(${CPR_INCLUDE_DIRS})
 
 add_subdirectory("vk-api")
+add_subdirectory("storage")
