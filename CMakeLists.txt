@@ -3,10 +3,10 @@ project("vk-message-loader")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_BUILD_TYPE Debug)
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Werror")
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_EXTRA_FLAGS}")
 
-include_directories("." "3rd-party/cpr" "3rd-party/rapidjson/include")
+include_directories("." "3rd-party/rapidjson/include")
 enable_testing()
 
 # Settings for "cpr":
