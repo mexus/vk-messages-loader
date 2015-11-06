@@ -1,0 +1,4 @@
+add_executable("utils-test-json"
+        "json.cpp"
+)
+target_link_libraries("utils-test-json" "utils-json" ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

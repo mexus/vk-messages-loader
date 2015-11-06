@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include <string>
 #include <vector>
+#include <utils/json.h>
 
 namespace storage {
 
@@ -18,5 +18,15 @@ struct Message {
     std::string body;
     std::vector<Attachment> attachments;
 };
+
+}
+
+namespace util {
+
+template<> bool JsonToObject<storage::Attachment>(const rapidjson::Value& json, storage::Attachment* object);
+template<> rapidjson::Value JsonFromObject<storage::Attachment>(const storage::Attachment& object, JsonAllocator& allocator);
+
+template<> bool JsonToObject<storage::Message>(const rapidjson::Value& json, storage::Message* object);
+template<> rapidjson::Value JsonFromObject<storage::Message>(const storage::Message& object, JsonAllocator& allocator);
 
 }

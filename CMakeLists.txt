@@ -7,6 +7,8 @@ SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_EXTRA_FLAGS}")
 
 include_directories("." "3rd-party/rapidjson/include")
+
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 enable_testing()
 
 # Settings for "cpr":
@@ -19,3 +21,4 @@ message(${CPR_INCLUDE_DIRS})
 
 add_subdirectory("vk-api")
 add_subdirectory("storage")
+add_subdirectory("utils")
