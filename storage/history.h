@@ -8,8 +8,6 @@
 
 namespace storage {
 
-class HistoryStorage;
-
 class History {
 public:
     History(const std::string& file_name);

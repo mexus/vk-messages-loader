@@ -8,7 +8,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_EXTRA_FLAGS}")
 
 include_directories("." "3rd-party/rapidjson/include")
 
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework system filesystem REQUIRED)
 enable_testing()
 
 # Settings for "cpr":
@@ -22,3 +22,5 @@ message(${CPR_INCLUDE_DIRS})
 add_subdirectory("vk-api")
 add_subdirectory("storage")
 add_subdirectory("utils")
+
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} "--output-on-failure")

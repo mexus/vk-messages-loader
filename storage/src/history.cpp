@@ -3,7 +3,10 @@
 namespace storage {
 
 History::History(const std::string& file_name) : file_name_(file_name) {
-    LoadData();
+    try {
+        LoadData();
+    } catch (const std::runtime_error& ) {
+    }
 }
 
 History::~History() {
@@ -27,6 +30,7 @@ void History::LoadData() {
 
 void History::WriteData() const {
     rapidjson::Document document;
+    document.SetObject();
     auto& allocator = document.GetAllocator();
     util::JsonAddMember(&document, "data", data_, allocator);
     util::JsonToFile(file_name_, document);
