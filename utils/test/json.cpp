@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(string_members_chain) {
     BOOST_REQUIRE_EQUAL(etalon_value2, result2);
 }
 
-BOOST_AUTO_TEST_CASE(stream_write) {
+BOOST_AUTO_TEST_CASE(stream_write, *boost::unit_test::depends_on("utils_json/string_member")) {
     rapidjson::Document doc;
     doc.SetObject();
     auto& allocator = doc.GetAllocator();
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(stream_write) {
     BOOST_REQUIRE_EQUAL(etalon_json, stream.str());
 }
 
-BOOST_AUTO_TEST_CASE(stream_read) {
+BOOST_AUTO_TEST_CASE(stream_read, *boost::unit_test::depends_on("utils_json/string_member")) {
     const std::string field("field");
     const std::string etalon_value("va\nl");
     const std::string etalon_value_escaped("va\\nl");
