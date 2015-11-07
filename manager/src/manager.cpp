@@ -1,4 +1,5 @@
 #include <manager/manager.h>
+#include <vk-api/users.h>
 
 namespace {
 struct FriendsIdCompare {
@@ -22,6 +23,9 @@ Manager::Manager(const std::string& config_file)
           history_db_(settings_.storage_path + "/messages"),
           friends_cache_(settings_.storage_path + "/friends.data") {
     friends_cache_.Load();
+    vk_api::UsersAPI users_api(&vk_interface_);
+    auto user = users_api.GetUser();
+    current_user_id_ = user.user_id;
 }
 
 Manager::~Manager() {
@@ -66,7 +70,7 @@ void Manager::LoadMessages() {
                     vk_message.id,
                     vk_message.date,
                     vk_message.from_id,
-                    vk_message.user_id,
+                    (vk_message.user_id == vk_message.from_id) ? current_user_id_ : vk_message.user_id,
                     std::move(vk_message.body),
                     {}
             };

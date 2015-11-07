@@ -6,5 +6,14 @@ add_library("manager"
 )
 
 SET(EXE_NAME "cli")
-add_executable(${EXE_NAME} "manager.cpp")
-target_link_libraries(${EXE_NAME} "vk-api" "utils-json" "storage" "manager" ${CPR_LIBRARIES})
+add_executable(${EXE_NAME} "cli.cpp")
+target_link_libraries(${EXE_NAME}
+        "manager"
+        "vk-api"
+        "utils-json"
+        "storage"
+        ${CPR_LIBRARIES}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+)

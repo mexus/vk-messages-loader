@@ -30,6 +30,9 @@ RequestsManager::Response CommunicationInterface::SendRequest(const std::string&
         return reply;
     }
     auto &doc = reply.json;
+    if (!doc.IsObject()) {
+        return reply;
+    }
     if (!doc.HasMember("error") && !doc.HasMember("response")) {
         std::cerr << "Reply from the server is mallformed: there is neither no erorr, nor response field\n";
         return {};

@@ -5,6 +5,7 @@ add_library("vk-api"
     "src/intervals-manager.cpp"
     "src/messages.cpp"
     "src/requests-manager.cpp"
+    "src/users.cpp"
 )
 
 add_subdirectory("test")

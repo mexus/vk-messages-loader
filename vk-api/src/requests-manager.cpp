@@ -68,6 +68,7 @@ RequestsManager::Response RequestsManager::MakeRequest(const cpr::Url& url, cons
                 case PASS:
                     return {std::move(doc), error};
                 case RETRY:
+                    std::cout << "Make another attempt with url " << http_response.url << "\n";
                     return MakeRequest(url, parameters);
                 case BREAK:
                     return {{}, error};

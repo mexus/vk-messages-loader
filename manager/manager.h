@@ -27,6 +27,7 @@ private:
     vk_api::CommunicationInterface vk_interface_;
     storage::HistoryDB history_db_;
     FriendsCache friends_cache_;
+    uint64_t current_user_id_;
 
     void SaveSettings() const;
 

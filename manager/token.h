@@ -11,6 +11,7 @@ public:
     };
 
     Token(const std::string& app_id, const std::string& file_name);
+
     std::string GetToken();
 
 protected:
