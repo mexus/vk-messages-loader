@@ -9,33 +9,14 @@
 
 namespace vk_api {
 
-CommunicationInterface::CommunicationInterface(const std::string& client_id, const TokenRetrieve& callback)
-        : client_id_(client_id),
-          token_retrieve_callback_(callback) {
+CommunicationInterface::CommunicationInterface(const TokenRetrieve& callback)
+        : token_retrieve_callback_(callback) {
     if (!callback)
         throw std::logic_error("Callback function should not be null");
 }
 
-std::string CommunicationInterface::GetAuthUrl() const {
-    static const std::string
-        address("https://oauth.vk.com/authorize"),
-        redirect_url("https://oauth.vk.com/blank.html"),
-        display("page"),
-        response_type("token"),
-        version("5.37"),
-        scope("messages,friends");
-    cpr::Parameters params;
-    params.AddParameter({"display", display});
-    params.AddParameter({"redirect_url", redirect_url});
-    params.AddParameter({"response_type", response_type});
-    params.AddParameter({"v", version});
-    params.AddParameter({"scope", scope});
-    params.AddParameter({"client_id", client_id_});
-    return address + "?" + params.content;
-}
-
 void CommunicationInterface::UpdateToken() {
-    std::string token = token_retrieve_callback_(GetAuthUrl());
+    std::string token = token_retrieve_callback_();
     if (token.empty())
         throw std::runtime_error("Empty token received");
     access_token_ = token;

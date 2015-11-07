@@ -36,4 +36,11 @@ void History::WriteData() const {
     util::JsonToFile(file_name_, document);
 }
 
+uint64_t History::LastMessageId() const {
+    if (data_.empty()) {
+        return 0;
+    }
+    return data_.back().message_id;
+}
+
 }

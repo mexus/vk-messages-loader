@@ -35,7 +35,7 @@ MessageAPI::MessageAPI(CommunicationInterface* interface) : vk_interface_(interf
 }
 
 std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_message_id, uint64_t total_count) {
-    static const unsigned max_messages_per_request = 4;
+    static const unsigned max_messages_per_request = 200;
     std::vector<MessageAPI::Message> total_messages;
     cpr::Parameters const_params {
             {"user_id", std::to_string(user_id)}
@@ -43,7 +43,10 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
     uint64_t last_message_id = start_message_id;
     while (true) {
         auto params = const_params;
-        unsigned count = std::min<uint64_t>(total_count - total_messages.size(), max_messages_per_request);
+        unsigned count = max_messages_per_request;
+        if (total_count != 0) {
+            count = std::min<uint64_t>(total_count - total_messages.size(), max_messages_per_request);
+        }
         bool chronological = false;
         params.AddParameter({"count", std::to_string(count)});
         if (last_message_id != 0) {
@@ -67,7 +70,10 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
             break ;
         }
         size_t received = response.items.size();
-        std::cout << "Received " << received << " messages out of " << response.count << "\n";
+        // std::cout << "Received " << received << " messages out of " << response.count << "\n";
+        if (total_count == 0) {
+            total_count = response.count;
+        }
 
         if (chronological) {
             total_messages.insert(total_messages.end(),

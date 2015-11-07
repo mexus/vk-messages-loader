@@ -121,7 +121,7 @@ rapidjson::Document JsonFromFile(const std::string& file_name) {
 }
 
 bool JsonToFile(const std::string& file_name, const rapidjson::Document& document) {
-    std::ofstream f;
+    std::ofstream f(file_name);
     if (!f) {
         std::cerr << "Can't open file '" << file_name << "' for writing\n";
         return {};
@@ -141,6 +141,7 @@ void JsonToStream(std::ostream& stream, const rapidjson::Document& document) {
     OStreamWrapper wrapper(stream);
     rapidjson::PrettyWriter<OStreamWrapper> writer(wrapper);
     document.Accept(writer);
+    std::cout << "Document has been written\n";
 }
 
 }

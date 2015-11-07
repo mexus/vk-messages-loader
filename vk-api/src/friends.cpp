@@ -17,9 +17,20 @@ bool JsonToObject<vk_api::FriendsAPI::Friend>(const rapidjson::Value& json, vk_a
     return res;
 }
 
+template<>
+rapidjson::Value JsonFromObject<vk_api::FriendsAPI::Friend>(const vk_api::FriendsAPI::Friend& object, JsonAllocator& allocator) {
+    rapidjson::Value json(rapidjson::kObjectType);
+    JsonAddMembers(&json, allocator,
+                   "id", object.user_id,
+                   "first_name", object.first_name,
+                   "last_name", object.last_name);
+    return json;
+}
+
 // This function is needed to avoid a linker error
 template<>
-bool JsonToObject<vk_api::List<vk_api::FriendsAPI::Friend>>(const rapidjson::Value& json, vk_api::List<vk_api::FriendsAPI::Friend>* object) {
+bool JsonToObject<vk_api::List<vk_api::FriendsAPI::Friend>>(const rapidjson::Value& json,
+                                                            vk_api::List<vk_api::FriendsAPI::Friend>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
     return JsonToObject<vk_api::FriendsAPI::Friend>(json, object);

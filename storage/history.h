@@ -15,6 +15,7 @@ public:
 
     void AddMessage(Message&& message);
     const std::vector<Message>& GetData() const;
+    uint64_t LastMessageId() const;
 
 private:
     const std::string file_name_;

@@ -22,5 +22,6 @@ message(${CPR_INCLUDE_DIRS})
 add_subdirectory("vk-api")
 add_subdirectory("storage")
 add_subdirectory("utils")
+add_subdirectory("manager")
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} "--output-on-failure")
