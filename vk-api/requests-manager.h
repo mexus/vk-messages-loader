@@ -3,16 +3,29 @@
 #include <vk-api/intervals-manager.h>
 #include <cpr.h>
 
+#include "data-types.h"
+
 namespace vk_api {
 
 class RequestsManager {
 public:
-    typedef std::unique_ptr<rapidjson::Document> Response;
-    RequestsManager(IntervalsManager* intervals_manager);
+    struct Response {
+        rapidjson::Document json;
+        Error error;
+    };
+    RequestsManager();
     Response MakeRequest(const cpr::Url& url, const cpr::Parameters& parameters);
 
 private:
-    IntervalsManager * const intervals_manager_;
+    IntervalsManager intervals_manager_;
+
+    enum Handling {
+        RETRY,
+        BREAK,
+        PASS
+    };
+
+    Handling HandleVkError(const rapidjson::Value& json, Error* error);
 
 };
 

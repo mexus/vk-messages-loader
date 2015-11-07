@@ -1,20 +1,43 @@
 #include <vk-api/intervals-manager.h>
 #include <thread>
+#include <iostream>
 
 namespace vk_api {
-IntervalsManager::IntervalsManager(const std::chrono::milliseconds& interval)
-        : current_interval_(interval) {
-    last_time = std::chrono::steady_clock::now() - interval;
+
+const std::chrono::milliseconds IntervalsManager::kBaseInterval(400);
+const std::chrono::milliseconds IntervalsManager::kDecreaseInterval(3000);
+
+IntervalsManager::IntervalsManager() : increase_level_(0) {
+    last_request = Clock::now() - kBaseInterval;
 }
 
 void IntervalsManager::Wait() {
-    auto now = std::chrono::steady_clock::now();
-    if (now > last_time + current_interval_) {
+    auto now = Clock::now();
+    auto interval = CalculateInterval(now);
+
+    auto awake_time = last_request + interval;
+
+    std::chrono::milliseconds tolerance(50);
+    if (awake_time <= now + tolerance) {
+        last_request = Clock::now();
         return ;
     }
-    auto diff = now - (last_time + current_interval_);
-    std::this_thread::sleep_for(diff);
-    last_time = now;
+
+    std::this_thread::sleep_until(awake_time);
+    last_request = Clock::now();
+}
+
+void IntervalsManager::IncreaseInterval() {
+    ++increase_level_;
+    last_increase = Clock::now();
+}
+
+std::chrono::milliseconds IntervalsManager::CalculateInterval(const Clock::time_point& now) {
+    if (increase_level_ != 0 && (now - last_increase > kDecreaseInterval)) {
+        --increase_level_;
+    }
+    auto interval = kBaseInterval + 0.5 * kBaseInterval * increase_level_;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(interval);
 }
 
 }

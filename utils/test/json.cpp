@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE utils json
+#define BOOST_TEST_MODULE utils
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <limits>
