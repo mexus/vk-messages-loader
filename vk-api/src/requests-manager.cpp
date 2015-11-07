@@ -75,6 +75,9 @@ RequestsManager::Response RequestsManager::MakeRequest(const cpr::Url& url, cons
             }
         }
         return {std::move(doc), {Error::OK, "", 0}};
+    } else if (http_response.status_code == 0) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        return MakeRequest(url, parameters);
     }
     std::cerr << "URL: [" << http_response.url << "]\n";
     std::cerr << "Received an http error code: " << http_response.status_code << "\n";

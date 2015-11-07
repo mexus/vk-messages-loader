@@ -60,7 +60,7 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
         RequestsManager::Response reply = vk_interface_->SendRequest(kInterfaceName, "getHistory", std::move(params));
         if (reply.error.status != Error::OK) {
             std::cerr << "Can't process with a response due to error(s)\n";
-            return {};
+            break ;
         }
 
         List<Message> response;
@@ -70,7 +70,6 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
             break ;
         }
         size_t received = response.items.size();
-        // std::cout << "Received " << received << " messages out of " << response.count << "\n";
         if (total_count == 0) {
             total_count = response.count;
         }
