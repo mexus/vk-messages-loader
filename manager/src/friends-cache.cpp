@@ -34,4 +34,8 @@ std::vector<vk_api::FriendsAPI::Friend>& FriendsCache::GetFriends() {
     return friends_;
 }
 
+const std::vector<vk_api::FriendsAPI::Friend>& FriendsCache::GetFriends() const {
+    return friends_;
+}
+
 }

@@ -1,4 +1,5 @@
 #include <manager/manager.h>
+#include <algorithm>
 #include <vk-api/users.h>
 
 namespace {
@@ -63,7 +64,7 @@ void Manager::LoadMessages() {
         uint64_t last_message_id = history->LastMessageId();
         auto messages = messages_api.GetMessages(user_id, last_message_id);
         if (messages.empty()) {
-            break ;
+            continue ;
         }
         for (auto& vk_message: messages) {
             storage::Message storage_message {
@@ -97,6 +98,29 @@ void Manager::LoadFriends() {
         }
     }
     friends_cache_.Save();
+}
+
+std::vector<vk_api::FriendsAPI::Friend> Manager::GetFriends() const {
+    return friends_cache_.GetFriends();
+}
+
+std::vector<uint64_t> Manager::GetActiveFriends() const {
+    return settings_.users;
+}
+
+struct UsersIdComparison {
+    UsersIdComparison(uint64_t id) : id(id) {}
+    bool operator()(const uint64_t& user) const {
+        return user == id;
+    }
+    uint64_t id;
+};
+
+void Manager::AddActiveFriend(uint64_t user_id) {
+    auto it = std::find_if(settings_.users.begin(), settings_.users.end(), UsersIdComparison(user_id));
+    if (it == settings_.users.end()) {
+        settings_.users.push_back(user_id);
+    }
 }
 
 }

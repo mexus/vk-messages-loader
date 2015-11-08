@@ -11,6 +11,7 @@ public:
     void Save() const;
 
     std::vector<vk_api::FriendsAPI::Friend>& GetFriends();
+    const std::vector<vk_api::FriendsAPI::Friend>& GetFriends() const;
 
 private:
     static const std::string kJsonField;

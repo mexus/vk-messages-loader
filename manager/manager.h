@@ -18,6 +18,11 @@ public:
     void LoadFriends();
     void LoadMessages();
 
+    std::vector<vk_api::FriendsAPI::Friend> GetFriends() const;
+    std::vector<uint64_t> GetActiveFriends() const;
+
+    void AddActiveFriend(uint64_t id);
+
 private:
     static const std::string kSettingsField;
 
