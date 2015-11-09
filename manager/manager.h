@@ -1,12 +1,13 @@
 #include <algorithm>
 #include <ctime>
 #include <iostream>
-#include <vk-api/communication-interface.h>
-#include <vk-api/messages.h>
+#include <manager/export.h>
 #include <manager/friends-cache.h>
 #include <manager/settings.h>
 #include <manager/token.h>
 #include <storage/history-db.h>
+#include <vk-api/communication-interface.h>
+#include <vk-api/messages.h>
 
 namespace manager {
 
@@ -22,6 +23,7 @@ public:
     std::vector<uint64_t> GetActiveFriends() const;
 
     void AddActiveFriend(uint64_t id);
+    void ExportHistory();
 
 private:
     static const std::string kSettingsField;
@@ -33,6 +35,7 @@ private:
     storage::HistoryDB history_db_;
     FriendsCache friends_cache_;
     uint64_t current_user_id_;
+    Export export_;
 
     void SaveSettings() const;
 

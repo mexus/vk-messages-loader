@@ -1,5 +1,6 @@
 #include <manager/manager.h>
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <vk-api/users.h>
 
 namespace {
@@ -120,6 +121,22 @@ void Manager::AddActiveFriend(uint64_t user_id) {
     auto it = std::find_if(settings_.users.begin(), settings_.users.end(), UsersIdComparison(user_id));
     if (it == settings_.users.end()) {
         settings_.users.push_back(user_id);
+    }
+}
+
+void Manager::ExportHistory() {
+    auto path =boost::filesystem::path(settings_.storage_path) / "exported/";
+    if (!boost::filesystem::exists(path)) {
+        boost::filesystem::create_directory(path);
+    }
+    auto& friends = friends_cache_.GetFriends();
+    for (auto& user_id: settings_.users) {
+        std::string user_path = (path / std::to_string(user_id)).string();
+        auto user_history = history_db_.GetUser(user_id);
+        if (!user_history) {
+            continue ;
+        }
+        export_.ExportToFile(friends, user_history, user_path);
     }
 }
 

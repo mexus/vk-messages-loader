@@ -72,5 +72,8 @@ int main() {
     if (InputYesOrNo("Update messages database?")) {
         manager.LoadMessages();
     }
+    if (InputYesOrNo("Export messages?")) {
+        manager.ExportHistory();
+    }
     return 0;
 }

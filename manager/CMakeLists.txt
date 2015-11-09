@@ -3,6 +3,7 @@ add_library("manager"
             "src/token.cpp"
             "src/settings.cpp"
             "src/manager.cpp"
+            "src/export.cpp"
 )
 
 SET(EXE_NAME "cli")
