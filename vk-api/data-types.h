@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cinttypes>
-#include <iostream>
 #include <vector>
+#include <map>
 #include <utils/json.h>
 
 namespace vk_api {
@@ -13,16 +13,40 @@ struct List {
     std::vector<T> items;
 };
 
-struct Error {
-    enum Status {
-        OK = 0,
-        HTTP_ERROR,
-        PARSE_ERROR,
-        VK_ERROR
+enum VK_ERRORS {
+    UNKNOWN = 1,
+    APP_IS_OFF = 2,
+    UNKNOWN_METHOD = 3,
+    WRONG_SIGNATURE = 4,
+    AUTHORIZATION_FAILED = 5,
+    TOO_FAST_QUERIES = 6,
+    PERMISSION_DENIED = 7,
+    INCORRECT_QUERY = 8,
+    TOO_MANY_SIMILAR_QUERIES = 9,
+    INTERNAL_ERROR = 10,
+    TEST_APPLICATION = 11,
+    CAPTURE_REQUIRED = 14,
+    ACCESS_DENIED = 15,
+    HTTPS_REQUIRED = 16,
+    VALIDATION_REQUIRED = 17,
+    METHOD_DISABLER = 23,
+    USER_CONFIRMATION_REQUIRED = 24,
+    PARAMETER_ERROR = 100,
+    WRONG_APP_ID = 101,
+    WRONG_USER_ID = 113,
+    WRONG_TIMESTAMP = 150
+};
+
+struct VkError {
+    struct RequestParam {
+        std::string key;
+        std::string value;
     };
-    Status status;
-    std::string error_message;
-    uint64_t vk_error_code;
+
+    uint64_t error_code;
+    std::string error_msg;
+    std::vector<RequestParam> request_params;
+    std::map<std::string, std::string> additional_data;
 };
 
 }
@@ -30,21 +54,13 @@ struct Error {
 namespace util {
 
 template<class T>
-bool JsonToObject(const rapidjson::Value& json, vk_api::List<T>* list) {
+void JsonToObject(const rapidjson::Value& json, vk_api::List<T>* list) {
     if (!json.IsObject()) {
-        std::cerr << "Provided json value is not an object\n";
-        return false;
+        throw util::json::NotAnObjectException();
     }
-    bool res = JsonGetMembers(json,
-                              "count", &list->count,
-                              "items", &list->items);
-    if (!res) {
-        std::cerr << "Can't extract list from a json value\n";
-    }
-    return res;
+    JsonGetMembers(json,
+                   "count", &list->count,
+                   "items", &list->items);
 }
-
-template<>
-bool JsonToObject<vk_api::Error>(const rapidjson::Value& json, vk_api::Error* error);
 
 }

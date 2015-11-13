@@ -3,18 +3,23 @@
 namespace util {
 
 template<>
-bool JsonToObject<vk_api::Error>(const rapidjson::Value& json, vk_api::Error* error) {
+void JsonToObject<vk_api::VkError>(const rapidjson::Value& json, vk_api::VkError* error) {
     if (!json.IsObject()) {
-        std::cerr << "Json value is not an object\n";
-        return false;
+        throw util::json::NotAnObjectException();
     }
-    bool res = JsonGetMember(json, "error_code", &error->vk_error_code);
-    if (!res) {
-        std::cerr << "Can't extract an error object from a json value\n";
-    } else {
-        error->status = vk_api::Error::VK_ERROR;
+    JsonGetMembers(json,
+                   "error_code", &error->error_code,
+                   "error_msg", &error->error_msg);
+    if (error->error_code == vk_api::VK_ERRORS::CAPTURE_REQUIRED) {
+        if (json.HasMember("captcha_sid") && json.HasMember("captcha_img")) {
+            std::string sid, img;
+            JsonGetMembers(json,
+                           "captcha_sid", &sid,
+                           "captcha_img", &img);
+            error->additional_data = {{"captcha_sid", sid},
+                                      {"captcha_img", img}};
+        }
     }
-    return res;
 }
 
 }

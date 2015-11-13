@@ -12,6 +12,6 @@ struct Settings {
 }
 
 namespace util {
-template<> bool JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Settings* object);
+template<> void JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Settings* object);
 template<> rapidjson::Value JsonFromObject<manager::Settings>(const manager::Settings& object, JsonAllocator& allocator);
 }

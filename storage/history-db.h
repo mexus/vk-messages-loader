@@ -17,8 +17,8 @@ private:
 
     std::shared_ptr<History> GetStorage(uint64_t user_id);
 
-    bool CheckPath() const;
-    static bool CheckFile(const std::string& file_name);
+    void CheckPath() const;
+    static void CheckFile(const std::string& file_name);
 
 };
 

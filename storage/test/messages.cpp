@@ -3,6 +3,7 @@
 #include <limits>
 #include <random>
 #include <storage/message.h>
+#include <utils/json.h>
 #include "operators.h"
 
 using namespace storage;
@@ -29,6 +30,6 @@ BOOST_AUTO_TEST_CASE(message_converters) {
     BOOST_REQUIRE(json.IsObject());
 
     Message result;
-    BOOST_REQUIRE(util::JsonToObject(json, &result));
+    util::JsonToObject(json, &result);
     BOOST_REQUIRE_EQUAL(etalon_message, result);
 }

@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(string_conversion) {
     auto json = JsonFromObject(etalon, allocator);
     BOOST_REQUIRE(json.IsString());
     std::string result;
-    BOOST_REQUIRE(JsonToObject(json, &result));
+    JsonToObject(json, &result);
     BOOST_REQUIRE_EQUAL(etalon, result);
 }
 
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(uint64_conversion) {
     auto json = JsonFromObject(etalon, allocator);
     BOOST_REQUIRE(json.IsUint64());
     uint64_t result;
-    BOOST_REQUIRE(JsonToObject(json, &result));
+    JsonToObject(json, &result);
     BOOST_REQUIRE_EQUAL(etalon, result);
 }
 
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(time_conversion) {
     auto json = JsonFromObject(etalon, allocator);
     BOOST_REQUIRE(json.IsInt64());
     time_t result;
-    BOOST_REQUIRE(JsonToObject(json, &result));
+    JsonToObject(json, &result);
     BOOST_REQUIRE_EQUAL(etalon, result);
 }
 
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(vector_string) {
     auto json = JsonFromObject(etalon, allocator);
     BOOST_REQUIRE(json.IsArray());
     std::vector<std::string> result;
-    BOOST_REQUIRE(JsonToObject(json, &result));
+    JsonToObject(json, &result);
     BOOST_REQUIRE_EQUAL_COLLECTIONS(etalon.begin(), etalon.end(),
                                     result.begin(), result.end());
 }
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(string_member) {
     BOOST_REQUIRE_EQUAL(etalon_value, it->value.GetString());
 
     std::string result;
-    BOOST_REQUIRE(JsonGetMember(doc, field, &result));
+    JsonGetMember(doc, field, &result);
     BOOST_REQUIRE_EQUAL(etalon_value, result);
 }
 
@@ -86,12 +86,12 @@ BOOST_AUTO_TEST_CASE(string_member_error) {
 
     it->value.SetString("WRONG VALUE");
     std::string result;
-    BOOST_REQUIRE(JsonGetMember(doc, field, &result));
-    std::cout << "Expecting an error.." << std::endl;
+    JsonGetMember(doc, field, &result);
     BOOST_REQUIRE_NE(etalon_value, result);
 
     doc.EraseMember(it);
-    BOOST_REQUIRE(!JsonGetMember(doc, field, &result));
+    BOOST_REQUIRE_EXCEPTION(JsonGetMember(doc, field, &result), json::NoFieldException,
+                            [&field](json::NoFieldException const& e){return e.GetField() == field;});
 }
 
 BOOST_AUTO_TEST_CASE(string_members_chain) {
@@ -114,9 +114,9 @@ BOOST_AUTO_TEST_CASE(string_members_chain) {
     BOOST_REQUIRE_EQUAL(etalon_value2, it2->value.GetString());
 
     std::string result1, result2;
-    BOOST_REQUIRE(JsonGetMembers(doc,
-                                 field1, &result1,
-                                 field2, &result2));
+    JsonGetMembers(doc,
+                   field1, &result1,
+                   field2, &result2);
     BOOST_REQUIRE_EQUAL(etalon_value1, result1);
     BOOST_REQUIRE_EQUAL(etalon_value2, result2);
 }
@@ -152,18 +152,8 @@ BOOST_AUTO_TEST_CASE(stream_read, *boost::unit_test::depends_on("utils_json/stri
 
     BOOST_REQUIRE(doc.IsObject());
     std::string result;
-    BOOST_REQUIRE(JsonGetMember(doc, field, &result));
+    JsonGetMember(doc, field, &result);
     BOOST_REQUIRE_EQUAL(etalon_value, result);
-}
-
-BOOST_AUTO_TEST_CASE(get_member_optional) {
-    const std::string field("non-existent-field");
-    rapidjson::Document doc;
-    doc.SetObject();
-
-    std::string result;
-    BOOST_REQUIRE(util::JsonGetMember(doc, field, &result, json::Optional{}));
-    BOOST_REQUIRE_EQUAL(result, std::string());
 }
 
 BOOST_AUTO_TEST_CASE(get_members_optional) {
@@ -173,10 +163,9 @@ BOOST_AUTO_TEST_CASE(get_members_optional) {
     doc.SetObject();
 
     std::string result1, result2;
-    bool res = util::JsonGetMembers(doc,
-                                    field1, &result1, json::Optional{},
-                                    field2, &result2, json::Optional{});
-    BOOST_REQUIRE(res);
+    util::JsonGetMembers(doc,
+                         field1, &result1, json::Optional{},
+                         field2, &result2, json::Optional{});
     BOOST_REQUIRE_EQUAL(result1, std::string());
     BOOST_REQUIRE_EQUAL(result2, std::string());
 }
@@ -192,11 +181,10 @@ BOOST_AUTO_TEST_CASE(get_members_optional_mixed) {
     util::JsonAddMember(&doc, field2, etalon_value, allocator);
 
     std::string result1, result2, result3;
-    bool res = util::JsonGetMembers(doc,
-                                    field1, &result1, json::Optional{},
-                                    field2, &result2,
-                                    field3, &result3, json::Optional{});
-    BOOST_REQUIRE(res);
+    util::JsonGetMembers(doc,
+                         field1, &result1, json::Optional{},
+                         field2, &result2,
+                         field3, &result3, json::Optional{});
     BOOST_REQUIRE_EQUAL(result1, std::string());
     BOOST_REQUIRE_EQUAL(result2, etalon_value);
     BOOST_REQUIRE_EQUAL(result3, std::string());

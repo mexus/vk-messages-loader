@@ -1,39 +1,41 @@
 #pragma once
 
 #include <cinttypes>
+#include <type_traits>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <rapidjson/document.h>
+#include "json-exceptions.h"
 
 namespace util {
 
 using JsonAllocator = rapidjson::Document::AllocatorType;
 
 template<class T>
-bool JsonToObject(const rapidjson::Value& json, T* object);
+void JsonToObject(const rapidjson::Value& json, T* object);
 
-template<> bool JsonToObject<std::string>(const rapidjson::Value& json, std::string* object);
-template<> bool JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object);
-template<> bool JsonToObject<time_t>(const rapidjson::Value& json, time_t* object);
+template<> void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object);
+template<> void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object);
+template<> void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object);
 
 template<class T>
-bool JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
+void JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
     if (!json.IsArray()) {
-        std::cerr << "Json value is not an array\n";
-        return false;
+        throw json::NotAnArrayException();
     }
     auto size = json.Size();
+    object->reserve(static_cast<size_t>(object->size() + size));
     for (decltype(size) i = 0; i != size; ++i) {
         auto &item = json[i];
-        T new_object;
-        if (!JsonToObject(item, &new_object)) {
-            std::cerr << "Can't convert item #" << i << " to object\n";
-        } else {
+        try {
+            T new_object;
+            JsonToObject(item, &new_object);
             object->push_back(std::move(new_object));
+        } catch (const json::Exception& e) {
+            std::cerr << "Can't convert item #" << i << " to object: " << e.what() << "\n";
         }
     }
-    return true;
 }
 
 template<class T>
@@ -60,34 +62,20 @@ void JsonAddMember(rapidjson::Value* json, const std::string& name, const T& obj
 }
 
 template<class T>
-bool JsonGetMember(const rapidjson::Value& json, const std::string& name, T* value) {
+void JsonGetMember(const rapidjson::Value& json, const std::string& name, T* object) {
+    if (!json.IsObject()) {
+        throw json::NotAnObjectException();
+    }
     auto it = json.FindMember(name.c_str());
     if (it == json.MemberEnd()) {
-        std::cerr << "Can't find field '" << name << "'\n";
-        return false;
-    } else if (!JsonToObject(it->value, value)) {
-        std::cerr << "Member '" << name << "' can not be created from json\n";
-        return false;
+        throw json::NoFieldException(name);
     }
-    return true;
+    JsonToObject(it->value, object);
 }
 
 namespace json {
 class Optional {
 };
-}
-
-template<class T>
-bool JsonGetMember(const rapidjson::Value& json, const std::string& name, T* value, json::Optional /*optional*/) {
-    auto it = json.FindMember(name.c_str());
-    if (it == json.MemberEnd()) {
-        std::cerr << "Can't find field '" << name << "'\n";
-        return true;
-    } else if (!JsonToObject(it->value, value)) {
-        std::cerr << "Member '" << name << "' can not be created from json\n";
-        return false;
-    }
-    return true;
 }
 
 void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator);
@@ -98,38 +86,37 @@ void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator, const std:
 }
 
 template<class T, class... Args>
-bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional optional, Args&&... args);
+void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional optional, Args&&... args);
 template<class T, class... Args>
-bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args);
-bool JsonGetMembers(const rapidjson::Value& json);
+void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args);
+void JsonGetMembers(const rapidjson::Value& json);
 
 template<class T, class... Args>
-bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional optional, Args&&... args) {
+void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional /*optional*/, Args&&... args) {
     if (!json.IsObject()) {
-        std::cerr << "Passed 'json' value is not an object\n";
-        return false;
+        throw json::NotAnObjectException();
     }
-    if (!JsonGetMember(json, name, value, optional)) {
-        return false;
+    JsonGetMembers(json, std::forward<Args>(args)...);
+    try {
+        JsonGetMember(json, name, value);
+    } catch (const json::Exception& )
+    {
+        // Just skip it, it's optional after all
     }
-    return JsonGetMembers(json, std::forward<Args>(args)...);
 }
 
 template<class T, class... Args>
-bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args) {
+void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args) {
     if (!json.IsObject()) {
-        std::cerr << "Passed 'json' value is not an object\n";
-        return false;
+        throw json::NotAnObjectException();
     }
-    if (!JsonGetMember(json, name, value)) {
-        return false;
-    }
-    return JsonGetMembers(json, std::forward<Args>(args)...);
+    JsonGetMembers(json, std::forward<Args>(args)...);
+    JsonGetMember(json, name, value);
 }
 
 
 rapidjson::Document JsonFromFile(const std::string& file_name);
-bool JsonToFile(const std::string& file_name, const rapidjson::Document& document);
+void JsonToFile(const std::string& file_name, const rapidjson::Document& document);
 
 rapidjson::Document JsonFromStream(std::istream& stream);
 void JsonToStream(std::ostream& stream, const rapidjson::Document& document);

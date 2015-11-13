@@ -5,7 +5,8 @@ namespace storage {
 History::History(const std::string& file_name) : file_name_(file_name) {
     try {
         LoadData();
-    } catch (const std::runtime_error& ) {
+    } catch (const util::BasicException& e) {
+        std::cerr << "Caught an exception while loading data: " << e.what() << "\n";
     }
 }
 
@@ -23,9 +24,7 @@ const std::vector<Message>& History::GetData() const {
 
 void History::LoadData() {
     rapidjson::Document document = util::JsonFromFile(file_name_);
-    if (!document.IsObject() || !util::JsonGetMember(document, "data", &data_)) {
-        throw std::runtime_error("Can't obtain data from a json file " + file_name_);
-    }
+    util::JsonGetMember(document, "data", &data_);
 }
 
 void History::WriteData() const {

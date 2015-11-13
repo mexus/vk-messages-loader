@@ -56,38 +56,31 @@ private:
 void JsonAddMembers(rapidjson::Value* /*json*/, JsonAllocator& /*allocator*/) {
 }
 
-bool JsonGetMembers(const rapidjson::Value& /*json*/) {
-    return true;
+void JsonGetMembers(const rapidjson::Value& /*json*/) {
 }
 
 template<>
-bool JsonToObject<std::string>(const rapidjson::Value& json, std::string* object) {
+void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object) {
     if (!json.IsString()) {
-        std::cerr << "Json value is not a string\n";
-        return false;
+        throw json::TypeStringException();
     }
-    *object = json.GetString();
-    return true;
+    *object = std::string(json.GetString(), json.GetStringLength());
 }
 
 template<>
-bool JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
+void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
     if (!json.IsUint64()) {
-        std::cerr << "Json value is not a uint64\n";
-        return false;
+        throw json::TypeUInt64Exception();
     }
     *object = json.GetUint64();
-    return true;
 }
 
 template<>
-bool JsonToObject<time_t>(const rapidjson::Value& json, time_t* object) {
+void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object) {
     if (!json.IsInt64()) {
-        std::cerr << "Json value is not a int64\n";
-        return false;
+        throw json::TypeInt64Exception();
     }
     *object = json.GetInt64();
-    return true;
 }
 
 template<>
@@ -114,20 +107,17 @@ rapidjson::Value JsonFromObject<time_t>(const time_t& object, JsonAllocator& /*a
 rapidjson::Document JsonFromFile(const std::string& file_name) {
     std::ifstream f(file_name);
     if (!f) {
-        std::cerr << "Can't open file '" << file_name << "' for reading\n";
-        return {};
+        throw FileReadException(file_name);
     }
     return JsonFromStream(f);
 }
 
-bool JsonToFile(const std::string& file_name, const rapidjson::Document& document) {
+void JsonToFile(const std::string& file_name, const rapidjson::Document& document) {
     std::ofstream f(file_name);
     if (!f) {
-        std::cerr << "Can't open file '" << file_name << "' for writing\n";
-        return {};
+        throw FileWriteException(file_name);
     }
     JsonToStream(f, document);
-    return true;
 }
 
 rapidjson::Document JsonFromStream(std::istream& stream) {
@@ -141,7 +131,6 @@ void JsonToStream(std::ostream& stream, const rapidjson::Document& document) {
     OStreamWrapper wrapper(stream);
     rapidjson::PrettyWriter<OStreamWrapper> writer(wrapper);
     document.Accept(writer);
-    std::cout << "Document has been written\n";
 }
 
 }

@@ -4,25 +4,21 @@
 namespace util {
 
 template<>
-bool JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_api::MessageAPI::Message* object) {
-    bool res = JsonGetMembers(json,
-                              "id", &object->id,
-                              "date", &object->date,
-                              "from_id", &object->from_id,
-                              "user_id", &object->user_id,
-                              "body", &object->body);
-    if (!res) {
-        std::cerr << "Can't extract a message from a json value\n";
-    }
-    return res;
+void JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_api::MessageAPI::Message* object) {
+    JsonGetMembers(json,
+                   "id", &object->id,
+                   "date", &object->date,
+                   "from_id", &object->from_id,
+                   "user_id", &object->user_id,
+                   "body", &object->body);
 }
 
 // This function is needed to avoid a linker error
 template<>
-bool JsonToObject<vk_api::List<vk_api::MessageAPI::Message>>(const rapidjson::Value& json, vk_api::List<vk_api::MessageAPI::Message>* object) {
+void JsonToObject<vk_api::List<vk_api::MessageAPI::Message>>(const rapidjson::Value& json, vk_api::List<vk_api::MessageAPI::Message>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
-    return JsonToObject<vk_api::MessageAPI::Message>(json, object);
+    JsonToObject<vk_api::MessageAPI::Message>(json, object);
 }
 
 }
@@ -57,16 +53,20 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
             params.AddParameter({"offset", "0"});
             chronological = true;
         }
-        RequestsManager::Response reply = vk_interface_->SendRequest(kInterfaceName, "getHistory", std::move(params));
-        if (reply.error.status != Error::OK) {
-            std::cerr << "Can't process with a response due to error(s)\n";
+        rapidjson::Document doc;
+        try {
+            auto reply = vk_interface_->SendRequest(kInterfaceName, "getHistory", std::move(params));
+            doc = std::move(reply);
+        } catch (const util::BasicException& e) {
+            std::cerr << "Caught an exception during a request: " << e.what() << "\n";
             break ;
         }
 
         List<Message> response;
-        bool res = util::JsonGetMember(reply.json, "response", &response);
-        if (!res) {
-            std::cerr << "Unable to convert response to a list of messages\n";
+        try {
+            util::JsonGetMember(doc, "response", &response);
+        } catch (util::json::Exception& e) {
+            std::cerr << "Unable to convert a response to a list of messages: " << e.what() << "\n";
             break ;
         }
         size_t received = response.items.size();

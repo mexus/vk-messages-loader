@@ -7,14 +7,10 @@
 namespace util {
 
 template<>
-bool JsonToObject<manager::Token::Data>(const rapidjson::Value& json, manager::Token::Data* object) {
-    bool res = JsonGetMembers(json,
-                              "access_token", &object->access_token,
-                              "expire_at", &object->expire_at);
-    if (!res) {
-        std::cerr << "Can't extract token data from json\n";
-    }
-    return res;
+void JsonToObject<manager::Token::Data>(const rapidjson::Value& json, manager::Token::Data* object) {
+    JsonGetMembers(json,
+                   "access_token", &object->access_token,
+                   "expire_at", &object->expire_at);
 }
 
 template<>
@@ -45,10 +41,7 @@ void Token::LoadData() {
         std::cerr << "Json document is not an object\n";
         return ;
     }
-    if (!util::JsonGetMember(doc, kFieldName, &data_)) {
-        std::cerr << "Can't extract token data from a json\n";
-        return ;
-    }
+    util::JsonGetMember(doc, kFieldName, &data_);
 }
 
 void Token::SaveData() const {
@@ -56,9 +49,7 @@ void Token::SaveData() const {
     doc.SetObject();
     auto& allocator = doc.GetAllocator();
     util::JsonAddMember(&doc, kFieldName, data_, allocator);
-    if (!util::JsonToFile(file_name_, doc)) {
-        std::cerr << "Unable to save token data\n";
-    }
+    util::JsonToFile(file_name_, doc);
 }
 
 std::string Token::GetToken() {
@@ -68,7 +59,11 @@ std::string Token::GetToken() {
         auto token = ObtainToken();
         if (!token.access_token.empty()) {
             data_ = token;
-            SaveData();
+            try {
+                SaveData();
+            } catch (const std::runtime_error& e) {
+                std::cerr << "Caught a runtime error while saving the data: " << e.what() << "\n";
+            }
         }
     }
     return data_.access_token;

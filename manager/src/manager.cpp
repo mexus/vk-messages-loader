@@ -31,20 +31,17 @@ Manager::Manager(const std::string& config_file)
 }
 
 Manager::~Manager() {
-    SaveSettings();
+    try {
+        SaveSettings();
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Caught a runtime error while saving the settings: " << e.what() << "\n";
+    }
 }
 
 Settings Manager::LoadSettings( const std::string& file_name) {
     Settings settings;
     auto doc = util::JsonFromFile(file_name);
-    if (!doc.IsObject()) {
-        std::cerr << "Json document is not an object\n";
-        return {};
-    }
-    if (!util::JsonGetMember(doc, kSettingsField, &settings)) {
-        std::cerr << "Can't extract token data from a json\n";
-        return {};
-    }
+    util::JsonGetMember(doc, kSettingsField, &settings);
     return settings;
 }
 
@@ -53,9 +50,7 @@ void Manager::SaveSettings() const {
     doc.SetObject();
     auto& allocator = doc.GetAllocator();
     util::JsonAddMember(&doc, kSettingsField, settings_, allocator);
-    if (!util::JsonToFile(config_file_, doc)) {
-        std::cerr << "Unable to save token data\n";
-    }
+    util::JsonToFile(config_file_, doc);
 }
 
 void Manager::LoadMessages() {
@@ -125,7 +120,7 @@ void Manager::AddActiveFriend(uint64_t user_id) {
 }
 
 void Manager::ExportHistory() {
-    auto path =boost::filesystem::path(settings_.storage_path) / "exported/";
+    auto path = boost::filesystem::path(settings_.storage_path) / "exported/";
     if (!boost::filesystem::exists(path)) {
         boost::filesystem::create_directory(path);
     }

@@ -9,6 +9,7 @@
 #define private public
 #include <storage/history-db.h>
 #undef private
+#include <storage/exceptions.h>
 
 namespace {
 
@@ -58,29 +59,37 @@ BOOST_AUTO_TEST_SUITE(history_check_path)
 BOOST_AUTO_TEST_CASE(ok) {
     Dir dir;
     HistoryDB storage((dir.path / "subpath").string());
-    BOOST_REQUIRE(storage.CheckPath());
+    storage.CheckPath();
 }
 
 BOOST_AUTO_TEST_CASE(file_exists) {
     File file;
     HistoryDB storage(file.path.string());
     std::cout << "Expecting an error regarding " << file.path << std::endl;
-    BOOST_REQUIRE(!storage.CheckPath());
+    BOOST_CHECK_EXCEPTION(storage.CheckPath(),
+                          PathIsFileException,
+                          [&file](const PathIsFileException& e) {
+                              return e.GetPath() == file.path.string();
+                          });
 }
 
 BOOST_AUTO_TEST_CASE(unable_create_path) {
     Dir dir;
     dir.MakeReadOnly();
-    auto path = dir.path / "subpath";
-    HistoryDB storage(path.string());
-    std::cout << "Expecting an error regarding " << path  << std::endl;
-    BOOST_REQUIRE(!storage.CheckPath());
+    std::string path = (dir.path / "subpath").string();
+    HistoryDB storage(path);
+    using exception = boost::filesystem::filesystem_error;
+    BOOST_CHECK_EXCEPTION(storage.CheckPath(),
+                          exception,
+                          [&path](const exception& e) {
+                              return e.path1().string() == path;
+                          });
 }
 
 BOOST_AUTO_TEST_CASE(get_storage) {
     Dir dir;
     HistoryDB storage(dir.path.string());
-    BOOST_REQUIRE(storage.CheckPath());
+    storage.CheckPath();
 
     uint64_t user_id = 123456;
     auto user_file = dir.path / std::to_string(user_id);
@@ -93,7 +102,7 @@ BOOST_AUTO_TEST_CASE(get_storage) {
 BOOST_AUTO_TEST_CASE(get_user) {
     Dir dir;
     HistoryDB storage(dir.path.string());
-    BOOST_REQUIRE(storage.CheckPath());
+    storage.CheckPath();
 
     uint64_t user_id = 123456;
     auto user_file = dir.path / std::to_string(user_id);

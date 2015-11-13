@@ -24,20 +24,11 @@ void CommunicationInterface::UpdateToken() {
 
 RequestsManager::Response CommunicationInterface::SendRequest(const std::string& interface, const std::string& method, cpr::Parameters&& params) {
     cpr::Url url = GetUrl(interface + "." + method, &params);
-    auto reply = requests_manager_.MakeRequest(url, params);
-    if (reply.error.status == Error::VK_ERROR) {
-        std::cerr << "Received VK error\n";
-        return reply;
+    auto doc = requests_manager_.MakeRequest(url, params);
+    if (!doc.HasMember("response")) {
+        throw util::json::NoFieldException("response");
     }
-    auto &doc = reply.json;
-    if (!doc.IsObject()) {
-        return reply;
-    }
-    if (!doc.HasMember("error") && !doc.HasMember("response")) {
-        std::cerr << "Reply from the server is mallformed: there is neither no erorr, nor response field\n";
-        return {};
-    }
-    return reply;
+    return doc;
 }
 
 std::string CommunicationInterface::GetUrl(const std::string& method_name, cpr::Parameters* params) {

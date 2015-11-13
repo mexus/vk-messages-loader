@@ -9,23 +9,17 @@ namespace vk_api {
 
 class RequestsManager {
 public:
-    struct Response {
-        rapidjson::Document json;
-        Error error;
-    };
-    RequestsManager();
+    using Response = rapidjson::Document;
+
+    RequestsManager() = default;
     Response MakeRequest(const cpr::Url& url, const cpr::Parameters& parameters);
 
 private:
     IntervalsManager intervals_manager_;
 
-    enum Handling {
-        RETRY,
-        BREAK,
-        PASS
-    };
-
-    Handling HandleVkError(const rapidjson::Value& json, Error* error);
+    rapidjson::Document GetDocument(const cpr::Url& url, const cpr::Parameters& parameters);
+    cpr::Response GetHttpResponse(const cpr::Url& url, const cpr::Parameters& parameters);
+    bool HandleVkError(const VkError& vk_error);
 
 };
 

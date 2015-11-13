@@ -6,15 +6,11 @@
 namespace util {
 
 template<>
-bool JsonToObject<vk_api::FriendsAPI::Friend>(const rapidjson::Value& json, vk_api::FriendsAPI::Friend* object) {
-    bool res = JsonGetMembers(json,
-                              "id", &object->user_id,
-                              "first_name", &object->first_name,
-                              "last_name", &object->last_name);
-    if (!res) {
-        std::cerr << "Unable to convert json value to a 'Friend' object\n";
-    }
-    return res;
+void JsonToObject<vk_api::FriendsAPI::Friend>(const rapidjson::Value& json, vk_api::FriendsAPI::Friend* object) {
+    JsonGetMembers(json,
+                   "id", &object->user_id,
+                   "first_name", &object->first_name,
+                   "last_name", &object->last_name);
 }
 
 template<>
@@ -29,11 +25,11 @@ rapidjson::Value JsonFromObject<vk_api::FriendsAPI::Friend>(const vk_api::Friend
 
 // This function is needed to avoid a linker error
 template<>
-bool JsonToObject<vk_api::List<vk_api::FriendsAPI::Friend>>(const rapidjson::Value& json,
+void JsonToObject<vk_api::List<vk_api::FriendsAPI::Friend>>(const rapidjson::Value& json,
                                                             vk_api::List<vk_api::FriendsAPI::Friend>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
-    return JsonToObject<vk_api::FriendsAPI::Friend>(json, object);
+    JsonToObject<vk_api::FriendsAPI::Friend>(json, object);
 }
 
 }
@@ -56,16 +52,13 @@ std::vector<FriendsAPI::Friend> FriendsAPI::GetFriends() {
     while (true) {
         auto params = const_params;
         params.AddParameter({"offset", std::to_string(offset)});
-        RequestsManager::Response reply = vk_interface_->SendRequest(kInterfaceName, "get", std::move(params));
-        if (reply.error.status != Error::OK) {
-            std::cerr << "Can't process with a response due to error(s)\n";
-            return {};
-        }
+        auto doc = vk_interface_->SendRequest(kInterfaceName, "get", std::move(params));
 
         List<Friend> response;
-        bool res = util::JsonGetMember(reply.json, "response", &response);
-        if (!res) {
-            std::cerr << "Unable to convert response to a list of friends\n";
+        try {
+            util::JsonGetMember(doc, "response", &response);
+        } catch (util::json::Exception& e) {
+            std::cerr << "Unable to convert response to a list of friends: " << e.what() << "\n";
             break ;
         }
         size_t count = response.items.size();

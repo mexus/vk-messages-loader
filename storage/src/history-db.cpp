@@ -2,9 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <storage/exceptions.h>
 
 namespace storage {
-
 
 HistoryDB::HistoryDB(const std::string& path) : path_(path) {
 }
@@ -18,55 +18,39 @@ std::shared_ptr<History> HistoryDB::GetUser(uint64_t user_id) {
         }
     }
     auto storage = GetStorage(user_id);
-    if (!storage) {
-        return {};
-    }
     users_history_[user_id] = storage;
     return storage;
 }
 
 std::shared_ptr<History> HistoryDB::GetStorage(uint64_t user_id) {
-    if (!CheckPath()) {
-        return {};
-    }
+    CheckPath();
     boost::filesystem::path path(path_);
     path /= std::to_string(user_id);
-    if (!boost::filesystem::exists(path) && !CheckFile(path.string<std::string>())) {
-        return {};
+    if (!boost::filesystem::exists(path)) {
+        CheckFile(path.string<std::string>());
     }
-    auto storage = new History(path.string<std::string>());
-    return std::shared_ptr<History>(storage);
+    return std::make_shared<History>(path.string<std::string>());
 }
 
-bool HistoryDB::CheckPath() const {
+void HistoryDB::CheckPath() const {
     boost::filesystem::path path(path_);
     if (boost::filesystem::exists(path)) {
         if (!boost::filesystem::is_directory(path)) {
-            std::cerr << "Path " << path << " exists, but it is not a directory\n";
-            return false;
+            throw PathIsFileException(path.string());
         }
     } else {
-        try {
-            boost::filesystem::create_directories(path);
-        } catch(const boost::filesystem::filesystem_error& fs_error) {
-            std::cerr << "Unable to create path because of an error: " << fs_error.what() << "\n";
-            return false;
-        }
+        boost::filesystem::create_directories(path);
         if (!boost::filesystem::exists(path)) {
-            std::cerr << "Unable to create path " << path << "\n";
-            return false;
+            throw PathCreateException(path.string());
         }
     }
-    return true;
 }
 
-bool HistoryDB::CheckFile(const std::string& path) {
+void HistoryDB::CheckFile(const std::string& path) {
     std::ofstream f(path, std::ios_base::binary | std::ios_base::app);
     if (!f.is_open()) {
-        std::cerr << "Can't create a file {" << path << "}\n";
-        return false;
+        throw util::FileWriteException(path);
     }
-    return true;
 }
 
 }

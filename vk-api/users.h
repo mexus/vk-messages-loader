@@ -4,6 +4,11 @@
 
 namespace vk_api {
 
+class NoUsersException: public ::util::BasicException {
+public:
+    NoUsersException();
+};
+
 class UsersAPI {
 public:
     struct User {
@@ -11,7 +16,6 @@ public:
     };
 
     UsersAPI(CommunicationInterface* vk_interface);
-
     User GetUser();
 
 private:
