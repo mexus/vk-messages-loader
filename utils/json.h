@@ -72,6 +72,24 @@ bool JsonGetMember(const rapidjson::Value& json, const std::string& name, T* val
     return true;
 }
 
+namespace json {
+class Optional {
+};
+}
+
+template<class T>
+bool JsonGetMember(const rapidjson::Value& json, const std::string& name, T* value, json::Optional /*optional*/) {
+    auto it = json.FindMember(name.c_str());
+    if (it == json.MemberEnd()) {
+        std::cerr << "Can't find field '" << name << "'\n";
+        return true;
+    } else if (!JsonToObject(it->value, value)) {
+        std::cerr << "Member '" << name << "' can not be created from json\n";
+        return false;
+    }
+    return true;
+}
+
 void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator);
 template<class T, class... Args>
 void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator, const std::string& name, const T& value, Args&&... args) {
@@ -79,7 +97,24 @@ void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator, const std:
     JsonAddMembers(json, allocator, std::forward<Args>(args)...);
 }
 
+template<class T, class... Args>
+bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional optional, Args&&... args);
+template<class T, class... Args>
+bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args);
 bool JsonGetMembers(const rapidjson::Value& json);
+
+template<class T, class... Args>
+bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional optional, Args&&... args) {
+    if (!json.IsObject()) {
+        std::cerr << "Passed 'json' value is not an object\n";
+        return false;
+    }
+    if (!JsonGetMember(json, name, value, optional)) {
+        return false;
+    }
+    return JsonGetMembers(json, std::forward<Args>(args)...);
+}
+
 template<class T, class... Args>
 bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args) {
     if (!json.IsObject()) {
@@ -91,6 +126,7 @@ bool JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* va
     }
     return JsonGetMembers(json, std::forward<Args>(args)...);
 }
+
 
 rapidjson::Document JsonFromFile(const std::string& file_name);
 bool JsonToFile(const std::string& file_name, const rapidjson::Document& document);

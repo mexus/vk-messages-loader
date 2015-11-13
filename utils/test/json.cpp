@@ -156,4 +156,50 @@ BOOST_AUTO_TEST_CASE(stream_read, *boost::unit_test::depends_on("utils_json/stri
     BOOST_REQUIRE_EQUAL(etalon_value, result);
 }
 
+BOOST_AUTO_TEST_CASE(get_member_optional) {
+    const std::string field("non-existent-field");
+    rapidjson::Document doc;
+    doc.SetObject();
+
+    std::string result;
+    BOOST_REQUIRE(util::JsonGetMember(doc, field, &result, json::Optional{}));
+    BOOST_REQUIRE_EQUAL(result, std::string());
+}
+
+BOOST_AUTO_TEST_CASE(get_members_optional) {
+    const std::string field1("non-existent-field1");
+    const std::string field2("non-existent-field2");
+    rapidjson::Document doc;
+    doc.SetObject();
+
+    std::string result1, result2;
+    bool res = util::JsonGetMembers(doc,
+                                    field1, &result1, json::Optional{},
+                                    field2, &result2, json::Optional{});
+    BOOST_REQUIRE(res);
+    BOOST_REQUIRE_EQUAL(result1, std::string());
+    BOOST_REQUIRE_EQUAL(result2, std::string());
+}
+
+BOOST_AUTO_TEST_CASE(get_members_optional_mixed) {
+    const std::string field1("non-existent-field1");
+    const std::string field2("existent-field2");
+    const std::string etalon_value("test");
+    const std::string field3("non-existent-field2");
+    rapidjson::Document doc;
+    doc.SetObject();
+    auto& allocator = doc.GetAllocator();
+    util::JsonAddMember(&doc, field2, etalon_value, allocator);
+
+    std::string result1, result2, result3;
+    bool res = util::JsonGetMembers(doc,
+                                    field1, &result1, json::Optional{},
+                                    field2, &result2,
+                                    field3, &result3, json::Optional{});
+    BOOST_REQUIRE(res);
+    BOOST_REQUIRE_EQUAL(result1, std::string());
+    BOOST_REQUIRE_EQUAL(result2, etalon_value);
+    BOOST_REQUIRE_EQUAL(result3, std::string());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
