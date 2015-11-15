@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <vk-api/users.h>
+#include <utils/exceptions.h>
 
 namespace {
 struct FriendsIdCompare {
@@ -24,7 +25,11 @@ Manager::Manager(const std::string& config_file)
           vk_interface_(std::bind(&Token::GetToken, token_)),
           history_db_(settings_.storage_path + "/messages"),
           friends_cache_(settings_.storage_path + "/friends.data") {
-    friends_cache_.Load();
+    try {
+        friends_cache_.Load();
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't load friends cache from file " << e.GetFileName() << "\n";
+    }
     vk_api::UsersAPI users_api(&vk_interface_);
     auto user = users_api.GetUser();
     current_user_id_ = user.user_id;
@@ -40,8 +45,12 @@ Manager::~Manager() {
 
 Settings Manager::LoadSettings( const std::string& file_name) {
     Settings settings;
-    auto doc = util::JsonFromFile(file_name);
-    util::JsonGetMember(doc, kSettingsField, &settings);
+    try {
+        auto doc = util::JsonFromFile(file_name);
+        util::JsonGetMember(doc, kSettingsField, &settings);
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't load settings from file " << e.GetFileName() << "\n";
+    }
     return settings;
 }
 
@@ -78,7 +87,11 @@ void Manager::LoadMessages() {
 }
 
 void Manager::LoadFriends() {
-    friends_cache_.Load();
+    try {
+        friends_cache_.Load();
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't load friends cache from file " << e.GetFileName() << "\n";
+    }
     auto& cached_friends = friends_cache_.GetFriends();
     vk_api::FriendsAPI friends_api(&vk_interface_);
     auto friends = friends_api.GetFriends();

@@ -10,7 +10,7 @@ void JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Sett
     JsonGetMembers(json,
                    "application_id", &object->application_id,
                    "storage_path", &object->storage_path,
-                   "users", &object->users);
+                   "users", &object->users, util::json::Optional{});
 }
 
 template<>

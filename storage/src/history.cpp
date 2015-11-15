@@ -3,11 +3,7 @@
 namespace storage {
 
 History::History(const std::string& file_name) : file_name_(file_name) {
-    try {
-        LoadData();
-    } catch (const util::BasicException& e) {
-        std::cerr << "Caught an exception while loading data: " << e.what() << "\n";
-    }
+    LoadData();
 }
 
 History::~History() {
@@ -23,8 +19,15 @@ const std::vector<Message>& History::GetData() const {
 }
 
 void History::LoadData() {
-    rapidjson::Document document = util::JsonFromFile(file_name_);
-    util::JsonGetMember(document, "data", &data_);
+    try {
+        rapidjson::Document document = util::JsonFromFile(file_name_);
+        util::JsonGetMember(document, "data", &data_);
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't read a history file: " << e.GetFileName() << "\n";
+    } catch (const util::json::Exception& e) {
+        std::cerr << "Caught a json exception while reading a history file '" << file_name_<< "': "
+                  << e.what() << ". The history file will be overwritten on save.\n";
+    }
 }
 
 void History::WriteData() const {

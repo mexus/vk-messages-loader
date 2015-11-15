@@ -26,9 +26,6 @@ std::shared_ptr<History> HistoryDB::GetStorage(uint64_t user_id) {
     CheckPath();
     boost::filesystem::path path(path_);
     path /= std::to_string(user_id);
-    if (!boost::filesystem::exists(path)) {
-        CheckFile(path.string<std::string>());
-    }
     return std::make_shared<History>(path.string<std::string>());
 }
 
@@ -43,13 +40,6 @@ void HistoryDB::CheckPath() const {
         if (!boost::filesystem::exists(path)) {
             throw PathCreateException(path.string());
         }
-    }
-}
-
-void HistoryDB::CheckFile(const std::string& path) {
-    std::ofstream f(path, std::ios_base::binary | std::ios_base::app);
-    if (!f.is_open()) {
-        throw util::FileWriteException(path);
     }
 }
 

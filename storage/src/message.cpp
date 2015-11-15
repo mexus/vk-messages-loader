@@ -26,7 +26,7 @@ void JsonToObject<storage::Message>(const rapidjson::Value& json, storage::Messa
                    "message_id", &object->message_id,
                    "date", &object->date,
                    "from_user_id", &object->from_user_id,
-                   "to_user_id", &object->to_user_id,
+                   "to_user_id", &object->to_user_id, util::json::Optional{},
                    "body", &object->body,
                    "attachments", &object->attachments);
 }

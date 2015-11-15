@@ -95,6 +95,7 @@ BOOST_AUTO_TEST_CASE(get_storage) {
     auto user_file = dir.path / std::to_string(user_id);
     auto history = storage.GetStorage(user_id);
     BOOST_REQUIRE(!(!history));
+    history.reset();
     BOOST_REQUIRE(boost::filesystem::exists(user_file) &&
                   boost::filesystem::is_regular_file(user_file));
 }
@@ -108,6 +109,7 @@ BOOST_AUTO_TEST_CASE(get_user) {
     auto user_file = dir.path / std::to_string(user_id);
     auto history = storage.GetUser(user_id);
     BOOST_REQUIRE(!(!history));
+    history.reset();
     BOOST_REQUIRE(boost::filesystem::exists(user_file) &&
                   boost::filesystem::is_regular_file(user_file));
 }

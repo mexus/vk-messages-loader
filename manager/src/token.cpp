@@ -32,7 +32,11 @@ Token::Token(const std::string& app_id, const std::string& file_name)
         : app_id_(app_id),
           file_name_(file_name),
           data_{"", 0} {
-    LoadData();
+    try {
+        LoadData();
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't load token data from " << e.GetFileName() << "\n";
+    }
 }
 
 void Token::LoadData() {
@@ -96,6 +100,9 @@ Token::Data Token::ObtainToken() {
 }
 
 std::string Token::GetAuthUrl() const {
+    if (app_id_.empty()) {
+        throw std::runtime_error("No application id information available");
+    }
     static const std::string
         address("https://oauth.vk.com/authorize"),
         redirect_url("https://oauth.vk.com/blank.html"),

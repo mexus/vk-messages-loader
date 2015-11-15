@@ -1,9 +1,10 @@
 add_library("manager"
-            "src/friends-cache.cpp"
-            "src/token.cpp"
-            "src/settings.cpp"
-            "src/manager.cpp"
+            "src/cli-exceptions-handler.cpp"
             "src/export.cpp"
+            "src/friends-cache.cpp"
+            "src/manager.cpp"
+            "src/settings.cpp"
+            "src/token.cpp"
 )
 
 SET(EXE_NAME "cli")

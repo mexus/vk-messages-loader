@@ -1,5 +1,8 @@
 #include <manager/manager.h>
 #include <boost/algorithm/string/predicate.hpp>
+#include "cli-exceptions-handler.h"
+
+CliExceptionsHandler exceptions_handler;
 
 bool InputYesOrNo(const std::string& question) {
     static const std::string yes("yes"), no("no");
@@ -53,7 +56,7 @@ void AddActiveFriend(const std::vector<vk_api::FriendsAPI::Friend>& friends, man
     manager->AddActiveFriend(friends[index - 1].user_id);
 }
 
-int main() {
+void Flow() {
     manager::Manager manager("config.data");
     if (InputYesOrNo("Update friends list?")) {
         manager.LoadFriends();
@@ -75,5 +78,9 @@ int main() {
     if (InputYesOrNo("Export messages?")) {
         manager.ExportHistory();
     }
+}
+
+int main() {
+    exceptions_handler.ProcessFunction(Flow);
     return 0;
 }
