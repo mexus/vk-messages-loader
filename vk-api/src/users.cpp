@@ -2,15 +2,6 @@
 #include <iostream>
 #include <utils/json.h>
 
-namespace util {
-
-template<>
-void JsonToObject<vk_api::UsersAPI::User>(const rapidjson::Value& json, vk_api::UsersAPI::User* object) {
-    JsonGetMembers(json, "id", &object->user_id);
-}
-
-}
-
 namespace vk_api {
 
 NoUsersException::NoUsersException(const std::string& at)
@@ -23,10 +14,10 @@ UsersAPI::UsersAPI(CommunicationInterface* vk_interface)
         : vk_interface_(vk_interface) {
 }
 
-UsersAPI::User UsersAPI::GetUser() {
-    auto reply = vk_interface_->SendRequest(kInterfaceName, "get", {});
+FriendsAPI::Friend UsersAPI::GetUser() {
+    auto reply = vk_interface_->SendRequest(kInterfaceName, "get", {{"fields", "uid,first_name,last_name"}});
 
-    std::vector<User> users;
+    std::vector<FriendsAPI::Friend> users;
     util::JsonGetMember(reply, "response", &users);
     if (users.empty()) {
         THROW_AT(NoUsersException);

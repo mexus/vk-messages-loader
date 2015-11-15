@@ -105,6 +105,10 @@ void CliExceptionsHandler::Handle(const manager::NoTokenException& e) {
     std::cerr << "At `" << e.GetAt() << "`: " << "No access token provided\n";
 }
 
+void CliExceptionsHandler::Handle(const manager::cache::NoDataException& e) {
+    std::cerr << "At `" << e.GetAt() << "`: " << "No data in a cache for id #" << e.GetId() << "\n";
+}
+
 void CliExceptionsHandler::Handle(const util::BasicException& e) {
     std::cerr << "At `" << e.GetAt() << "`: " << "Received a basic application exception: " << e.GetMessage() << "\n";
 }

@@ -2,17 +2,8 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <vk-api/users.h>
+#include <vk-api/friends.h>
 #include <utils/exceptions.h>
-
-namespace {
-struct FriendsIdCompare {
-    FriendsIdCompare(uint64_t id) : id(id) {}
-    bool operator()(const vk_api::FriendsAPI::Friend& lhs) const {
-        return lhs.user_id == id;
-    }
-    uint64_t id;
-};
-}
 
 namespace manager {
 
@@ -20,11 +11,18 @@ const std::string Manager::kSettingsField = "settings";
 
 Manager::Manager(const std::string& config_file)
         : config_file_(config_file),
-          settings_(LoadSettings(config_file_)),
+          settings_(LoadSettings(config_file)),
           token_(settings_.application_id, settings_.storage_path + "/token.data"),
           vk_interface_(std::bind(&Token::GetToken, token_)),
           history_db_(settings_.storage_path + "/messages"),
-          friends_cache_(settings_.storage_path + "/friends.data") {
+          users_cache_(settings_.storage_path + "/users.cache"),
+          friends_cache_(settings_.storage_path + "/friends.cache"),
+          history_export_(users_cache_) {
+    try {
+        users_cache_.Load();
+    } catch (const util::FileReadException& e) {
+        std::cout << "Can't load users cache from file " << e.GetFileName() << "\n";
+    }
     try {
         friends_cache_.Load();
     } catch (const util::FileReadException& e) {
@@ -32,6 +30,7 @@ Manager::Manager(const std::string& config_file)
     }
     vk_api::UsersAPI users_api(&vk_interface_);
     auto user = users_api.GetUser();
+    users_cache_.AddData({user.user_id, user.first_name, user.last_name});
     current_user_id_ = user.user_id;
 }
 
@@ -39,7 +38,7 @@ Manager::~Manager() {
     try {
         SaveSettings();
     } catch (const util::BasicException& e) {
-        std::cerr << "Caught a basic exception at `" << e.GetAt() << "` "
+        std::cerr << "Caught an application exception at `" << e.GetAt() << "` "
                   << "while saving settings: " << e.GetMessage() << "\n";
     }
 }
@@ -63,7 +62,7 @@ void Manager::SaveSettings() const {
     util::JsonToFile(config_file_, doc);
 }
 
-void Manager::LoadMessages() {
+void Manager::UpdateMessages() {
     vk_api::MessageAPI messages_api(&vk_interface_);
     for (auto& user_id: settings_.users) {
         auto history = history_db_.GetUser(user_id);
@@ -87,47 +86,32 @@ void Manager::LoadMessages() {
     return ;
 }
 
-void Manager::LoadFriends() {
-    try {
-        friends_cache_.Load();
-    } catch (const util::FileReadException& e) {
-        std::cout << "Can't load friends cache from file " << e.GetFileName() << "\n";
-    }
-    auto& cached_friends = friends_cache_.GetFriends();
+void Manager::UpdateFriends() {
     vk_api::FriendsAPI friends_api(&vk_interface_);
     auto friends = friends_api.GetFriends();
     if (friends.empty()) {
         return ;
     }
     for (auto& user: friends) {
-        auto cached_it = std::find_if(cached_friends.begin(), cached_friends.end(), FriendsIdCompare(user.user_id));
-        if (cached_it == cached_friends.end()) {
-            cached_friends.push_back(std::move(user));
-        } else {
-            *cached_it = std::move(user);
-        }
+        users_cache_.AddData(cache::User{user.user_id, user.first_name, user.last_name});
+        friends_cache_.AddData(std::move(user));
     }
+    users_cache_.Save();
     friends_cache_.Save();
 }
 
 std::vector<vk_api::FriendsAPI::Friend> Manager::GetFriends() const {
-    return friends_cache_.GetFriends();
+    return friends_cache_.GetDataAsVector();
 }
 
-std::vector<uint64_t> Manager::GetActiveFriends() const {
+std::vector<uint64_t> Manager::GetActiveUsers() const {
     return settings_.users;
 }
 
-struct UsersIdComparison {
-    UsersIdComparison(uint64_t id) : id(id) {}
-    bool operator()(const uint64_t& user) const {
-        return user == id;
-    }
-    uint64_t id;
-};
-
-void Manager::AddActiveFriend(uint64_t user_id) {
-    auto it = std::find_if(settings_.users.begin(), settings_.users.end(), UsersIdComparison(user_id));
+void Manager::AddActiveUser(uint64_t user_id) {
+    auto it = std::find_if(settings_.users.begin(),
+                           settings_.users.end(),
+                           [user_id](const uint64_t& user){return user_id == user;});
     if (it == settings_.users.end()) {
         settings_.users.push_back(user_id);
     }
@@ -138,15 +122,15 @@ void Manager::ExportHistory() {
     if (!boost::filesystem::exists(path)) {
         boost::filesystem::create_directory(path);
     }
-    auto& friends = friends_cache_.GetFriends();
     for (auto& user_id: settings_.users) {
         std::string user_path = (path / std::to_string(user_id)).string();
         auto user_history = history_db_.GetUser(user_id);
-        if (!user_history) {
-            continue ;
-        }
-        export_.ExportToFile(friends, user_history, user_path);
+        history_export_.ExportToFile(user_history, user_path);
     }
+}
+
+const cache::Users& Manager::GetUsersCache() const {
+    return users_cache_;
 }
 
 }

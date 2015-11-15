@@ -1,23 +1,14 @@
 #pragma once
+
 #include <vk-api/friends.h>
+#include "cache.h"
 
 namespace manager {
+namespace cache {
 
-class FriendsCache {
-public:
-    FriendsCache(const std::string& file_name);
+typedef MappedCache<vk_api::FriendsAPI::Friend> FriendsCache;
 
-    void Load();
-    void Save() const;
+template<> uint64_t GetIdentificator<vk_api::FriendsAPI::Friend>(const vk_api::FriendsAPI::Friend& data);
 
-    std::vector<vk_api::FriendsAPI::Friend>& GetFriends();
-    const std::vector<vk_api::FriendsAPI::Friend>& GetFriends() const;
-
-private:
-    static const std::string kJsonField;
-    const std::string file_name_;
-    std::vector<vk_api::FriendsAPI::Friend> friends_;
-
-};
-
+}
 }

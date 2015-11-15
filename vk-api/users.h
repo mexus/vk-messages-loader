@@ -1,6 +1,6 @@
 #pragma once
 
-#include "communication-interface.h"
+#include "friends.h"
 
 namespace vk_api {
 
@@ -11,12 +11,8 @@ public:
 
 class UsersAPI {
 public:
-    struct User {
-        uint64_t user_id;
-    };
-
     UsersAPI(CommunicationInterface* vk_interface);
-    User GetUser();
+    FriendsAPI::Friend GetUser();
 
 private:
     CommunicationInterface * const vk_interface_;

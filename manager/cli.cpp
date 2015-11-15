@@ -4,6 +4,11 @@
 
 CliExceptionsHandler exceptions_handler;
 
+std::shared_ptr<manager::Manager> GetManager() {
+    static auto pointer = std::make_shared<manager::Manager>("config.data");
+    return pointer;
+}
+
 bool InputYesOrNo(const std::string& question) {
     static const std::string yes("yes"), no("no");
     std::cout << question << " [yes/no]: ";
@@ -34,18 +39,21 @@ struct CompareFriends {
     uint64_t id;
 };
 
-void PrintActiveFriends(const std::vector<vk_api::FriendsAPI::Friend>& friends, const std::vector<uint64_t>& active) {
+void PrintActiveUsers(const std::vector<uint64_t>& active) {
+    auto& users_cache = GetManager()->GetUsersCache();
     for (uint64_t user_id: active) {
-        auto it = std::find_if(friends.begin(), friends.end(), CompareFriends(user_id));
         std::cout << "    Id " << user_id;
-        if (it != friends.end()) {
-            std::cout << " (" << it->first_name << " " << it->last_name << ")";
+        try {
+            auto user = users_cache.GetData(user_id);
+            std::cout << " (" << user.first_name << " " << user.last_name << ")";
+        } catch (const manager::cache::NoDataException&) {
+            // No user, no name conversion, fair enough
         }
         std::cout << "\n";
     }
 }
 
-void AddActiveFriend(const std::vector<vk_api::FriendsAPI::Friend>& friends, manager::Manager *manager) {
+void AddActiveUser(const std::vector<vk_api::FriendsAPI::Friend>& friends) {
     std::cout << "Enter a friends's number from the list above (the first one, not `id`): ";
     size_t index;
     std::cin >> index;
@@ -53,30 +61,30 @@ void AddActiveFriend(const std::vector<vk_api::FriendsAPI::Friend>& friends, man
         std::cout << "Unknown friend\n";
         return ;
     }
-    manager->AddActiveFriend(friends[index - 1].user_id);
+    GetManager()->AddActiveUser(friends[index - 1].user_id);
 }
 
 void Flow() {
-    manager::Manager manager("config.data");
+    auto manager_ = GetManager();
     if (InputYesOrNo("Update friends list?")) {
-        manager.LoadFriends();
+        manager_->UpdateFriends();
     }
-    auto friends = manager.GetFriends();
-    auto active_friends = manager.GetActiveFriends();
+    auto active_friends = manager_->GetActiveUsers();
+    auto friends = manager_->GetFriends();
     std::cout << "Friends to fetch message history:\n";
-    PrintActiveFriends(friends, active_friends);
+    PrintActiveUsers(active_friends);
     if (InputYesOrNo("Print friends list?")) {
-        PrintFriends(manager.GetFriends());
+        PrintFriends(friends);
         while (InputYesOrNo("Add a friend to fetch message history?")) {
-            AddActiveFriend(friends, &manager);
+            AddActiveUser(friends);
         }
-        PrintActiveFriends(friends, manager.GetActiveFriends());
+        PrintActiveUsers(active_friends);
     }
     if (InputYesOrNo("Update messages database?")) {
-        manager.LoadMessages();
+        manager_->UpdateMessages();
     }
     if (InputYesOrNo("Export messages?")) {
-        manager.ExportHistory();
+        manager_->ExportHistory();
     }
 }
 

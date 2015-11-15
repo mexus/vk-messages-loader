@@ -1,11 +1,12 @@
 add_library("manager"
             "src/cli-exceptions-handler.cpp"
             "src/exceptions.cpp"
-            "src/export.cpp"
             "src/friends-cache.cpp"
+            "src/history-export.cpp"
             "src/manager.cpp"
             "src/settings.cpp"
             "src/token.cpp"
+            "src/users-cache.cpp"
 )
 
 SET(EXE_NAME "cli")

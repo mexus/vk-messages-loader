@@ -28,6 +28,7 @@ public:
     virtual void Handle(const vk_api::ApiException& e) = 0;
     virtual void Handle(const manager::NoApplicationIdException& e) = 0;
     virtual void Handle(const manager::NoTokenException& e) = 0;
+    virtual void Handle(const manager::cache::NoDataException& e) = 0;
     virtual void Handle(const util::BasicException& e) = 0;
     virtual void Handle(const std::runtime_error& e) = 0;
     virtual void Handle(const std::exception& e) = 0;
@@ -74,6 +75,8 @@ public:
         } catch (const manager::NoApplicationIdException& e) {
             Handle(e);
         } catch (const manager::NoTokenException& e) {
+            Handle(e);
+        } catch (const manager::cache::NoDataException& e) {
             Handle(e);
         } catch (const util::BasicException& e) {
             Handle(e);

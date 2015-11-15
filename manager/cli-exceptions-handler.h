@@ -21,6 +21,7 @@ class CliExceptionsHandler: public util::ExceptionsHandler {
     void Handle(const vk_api::ApiException& e) override;
     void Handle(const manager::NoApplicationIdException& e) override;
     void Handle(const manager::NoTokenException& e) override;
+    void Handle(const manager::cache::NoDataException& e) override;
     void Handle(const util::BasicException& e) override;
     void Handle(const std::runtime_error& e) override;
     void Handle(const std::exception& e) override;
