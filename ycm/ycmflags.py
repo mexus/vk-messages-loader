@@ -8,6 +8,8 @@ class YcmFlags:
         self.flags = [
             '-std=c++11',
             '-x', 'c++',
+            '-Wall',
+            '-Wextra',
             '-I', './',
             '-I', './3rd-party/cpr/include/',
             '-I', './3rd-party/rapidjson/include/',
