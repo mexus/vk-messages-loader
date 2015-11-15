@@ -1,6 +1,8 @@
 #pragma once
 #include <utils/exceptions-handling.h>
 
+namespace cli {
+
 class CliExceptionsHandler: public util::ExceptionsHandler {
     void Handle(const util::FileWriteException& e) override;
     void Handle(const util::FileReadException& e) override;
@@ -27,3 +29,5 @@ class CliExceptionsHandler: public util::ExceptionsHandler {
     void Handle(const std::exception& e) override;
     void Handle() override; // Handle unknown exception
 };
+
+}

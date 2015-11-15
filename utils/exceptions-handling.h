@@ -34,10 +34,11 @@ public:
     virtual void Handle(const std::exception& e) = 0;
     virtual void Handle() = 0; // Handle unknown exception
 
-    template<class Func, class ...Args>
-    void ProcessFunction(Func&& func, Args&& ...args) {
+    template<class F>
+    bool ProcessFunction(F&& func) {
         try {
-            func(std::forward<Args>(args)...);
+            func();
+            return true;
         } catch (const util::FileWriteException& e) {
             Handle(e);
         } catch (const util::FileReadException& e) {
@@ -87,6 +88,7 @@ public:
         } catch (...) {
             Handle();
         }
+        return false;
     }
 };
 

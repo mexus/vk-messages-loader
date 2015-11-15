@@ -1,5 +1,7 @@
-#include <manager/cli-exceptions-handler.h>
+#include <cli/cli-exceptions-handler.h>
 #include <iostream>
+
+namespace cli {
 
 void CliExceptionsHandler::Handle(const util::FileWriteException& e) {
     std::cerr << "At `" << e.GetAt() << "`: " << "Write operation has failed for a file " << e.GetFileName() << "\n";
@@ -123,4 +125,6 @@ void CliExceptionsHandler::Handle(const std::exception& e) {
 
 void CliExceptionsHandler::Handle() {
     std::cerr << "Received an unknown exception\n";
+}
+
 }
