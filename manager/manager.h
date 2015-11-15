@@ -42,6 +42,10 @@ private:
     void SaveSettings() const;
 
     static Settings LoadSettings(const std::string& file_name);
+    static void AddAttachment(const std::unique_ptr<vk_api::Attachment>& attachment, storage::Message* storage_message);
+    static void AddAttachment(const vk_api::PhotoAttachment* attachment, storage::Message* storage_message);
+    static void AddAttachment(const vk_api::VideoAttachment* attachment, storage::Message* storage_message);
+    static void AddAttachment(const vk_api::StickerAttachment* attachment, storage::Message* storage_message);
 
 };
 

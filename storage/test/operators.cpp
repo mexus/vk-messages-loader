@@ -4,7 +4,7 @@
 namespace storage {
 
     bool operator==(const Attachment& lhs, const Attachment& rhs) {
-        return lhs.name == rhs.name &&
+        return lhs.type == rhs.type &&
                lhs.body == rhs.body;
     }
 
@@ -25,7 +25,7 @@ namespace storage {
 
 namespace std {
     ostream& operator<<(ostream& s, const storage::Attachment& attachment) {
-        s << "\t\tname: " << attachment.name << "\n";
+        s << "\t\ttype: " << attachment.type << "\n";
         s << "\t\tbody: " << attachment.body << "\n";
         return s;
     }

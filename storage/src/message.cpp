@@ -6,16 +6,18 @@ namespace util {
 
 template<>
 void JsonToObject<storage::Attachment>(const rapidjson::Value& json, storage::Attachment* object) {
+    uint64_t type;
     JsonGetMembers(json,
-                   "name", &object->name,
+                   "type", &type,
                    "body", &object->body);
+    object->type = static_cast<storage::AttachmentType>(type);
 }
 
 template<>
 rapidjson::Value JsonFromObject<storage::Attachment>(const storage::Attachment& object, JsonAllocator& allocator) {
     rapidjson::Value json(rapidjson::kObjectType);
     JsonAddMembers(&json, allocator,
-                  "name", object.name,
+                  "type", static_cast<uint64_t>(object.type),
                   "body", object.body);
     return json;
 }

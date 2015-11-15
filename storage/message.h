@@ -5,8 +5,14 @@
 
 namespace storage {
 
+enum AttachmentType : uint64_t {
+    PHOTO,
+    VIDEO,
+    STICKER
+};
+
 struct Attachment {
-    std::string name;
+    AttachmentType type;
     std::string body;
 };
 

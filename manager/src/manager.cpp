@@ -80,6 +80,9 @@ void Manager::UpdateMessages() {
                     std::move(vk_message.body),
                     {}
             };
+            for (auto& attachment: vk_message.attachments) {
+                AddAttachment(attachment, &storage_message);
+            }
             history->AddMessage(std::move(storage_message));
         }
     }
@@ -131,6 +134,45 @@ void Manager::ExportHistory() {
 
 const cache::Users& Manager::GetUsersCache() const {
     return users_cache_;
+}
+
+void Manager::AddAttachment(const std::unique_ptr<vk_api::Attachment>& attachment, storage::Message* storage_message) {
+    switch(attachment->GetKind()) {
+        case vk_api::PHOTO:
+            AddAttachment(static_cast<const vk_api::PhotoAttachment*>(attachment.get()), storage_message);
+            break;
+        case vk_api::VIDEO:
+            AddAttachment(static_cast<const vk_api::VideoAttachment*>(attachment.get()), storage_message);
+            break;
+        case vk_api::STICKER:
+            AddAttachment(static_cast<const vk_api::StickerAttachment*>(attachment.get()), storage_message);
+            break;
+    }
+}
+
+void Manager::AddAttachment(const vk_api::PhotoAttachment* photo, storage::Message* storage_message) {
+    storage::Attachment storage_attachment{storage::PHOTO, photo->url};
+    storage_message->attachments.push_back(std::move(storage_attachment));
+}
+
+void Manager::AddAttachment(const vk_api::VideoAttachment* video, storage::Message* storage_message) {
+    std::string body;
+    if (!video->title.empty()) {
+        body = "`" + video->title + "`";
+    }
+    if (!video->description.empty()) {
+        if (!body.empty()) body += ", ";
+        body += "`" + video->description + "`";
+    }
+    if (!body.empty()) body += ": ";
+    body += video->preview_url;
+    storage::Attachment storage_attachment{storage::VIDEO, std::move(body)};
+    storage_message->attachments.push_back(std::move(storage_attachment));
+}
+
+void Manager::AddAttachment(const vk_api::StickerAttachment* sticker, storage::Message* storage_message) {
+    storage::Attachment storage_attachment{storage::STICKER, sticker->url};
+    storage_message->attachments.push_back(std::move(storage_attachment));
 }
 
 }

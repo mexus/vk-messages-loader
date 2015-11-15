@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_CASE(message_converters) {
         users_distr(generator),
         "test body",
         {
-            {"attach1", "PICTURE"},
-            {"att2", "ahaha"}
+            {PHOTO, "PICTURE"},
+            {VIDEO, "ahaha"}
         }
     };
 

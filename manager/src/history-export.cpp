@@ -21,6 +21,9 @@ void HistoryExport::ExportToFile(const std::shared_ptr<storage::History>& histor
         f << FormateDate(message.date) << " ";
         f << GetUserName(message.from_user_id) << ": ";
         f << message.body << "\n";
+        for (auto& attachment: message.attachments) {
+            f << "[Attachment '" << AttachmentTypeToString(attachment.type) << "']: " << attachment.body << "\n";
+        }
     }
 }
 
@@ -37,6 +40,18 @@ std::string HistoryExport::GetUserName(uint64_t id) const {
         return user.first_name + " " + user.last_name;
     } catch (const manager::cache::NoDataException&) {
         return std::to_string(id);
+    }
+}
+
+
+std::string HistoryExport::AttachmentTypeToString(storage::AttachmentType attachment_type) {
+    switch (attachment_type) {
+        case storage::PHOTO:
+            return "photo";
+        case storage::VIDEO:
+            return "video";
+        case storage::STICKER:
+            return "sticker";
     }
 }
 

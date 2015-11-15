@@ -17,6 +17,8 @@ private:
 
     std::string FormateDate(time_t date_time) const;
     std::string GetUserName(uint64_t id) const;
+
+    static std::string AttachmentTypeToString(storage::AttachmentType attachment_type);
 };
 
 }

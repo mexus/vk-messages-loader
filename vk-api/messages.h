@@ -1,6 +1,7 @@
 #pragma once
 
 #include "communication-interface.h"
+#include "attachment.h"
 
 namespace vk_api {
 
@@ -12,6 +13,7 @@ public:
         uint64_t from_id;
         uint64_t user_id;
         std::string body;
+        std::vector<std::unique_ptr<Attachment>> attachments;
     };
 
     MessageAPI(CommunicationInterface* interface);

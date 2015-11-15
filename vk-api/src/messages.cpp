@@ -3,6 +3,58 @@
 
 namespace util {
 
+using Attachments = decltype(vk_api::MessageAPI::Message::attachments);
+using Attachment = Attachments::value_type;
+
+template<>
+void JsonToObject<Attachment>(const rapidjson::Value& json, Attachment* attachment) {
+    if (!json.IsObject()) {
+        THROW_AT(json::NotAnObjectException);
+    }
+    auto it = json.FindMember("type");
+    if (it == json.MemberEnd()) {
+        THROW_AT(json::NoFieldException, "type");
+    }
+    std::string type;
+    JsonToObject(it->value, &type);
+    if (type == "photo") {
+        auto photo = new vk_api::PhotoAttachment();
+        JsonGetMember(json, "photo", photo);
+        attachment->reset(photo);
+    } else if (type == "video") {
+        auto video = new vk_api::VideoAttachment();
+        JsonGetMember(json, "video", video);
+        attachment->reset(video);
+    } else if (type == "sticker") {
+        auto sticker = new vk_api::StickerAttachment();
+        JsonGetMember(json, "sticker", sticker);
+        attachment->reset(sticker);
+    } else {
+        std::cerr << "Unknown type " << type << "\n";
+    }
+}
+
+void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
+    if (!json.IsArray()) {
+        THROW_AT(json::NotAnArrayException);
+    }
+    auto size = json.Size();
+    for (decltype(size) i = 0; i != size; ++i) {
+        auto& item = json[i];
+        Attachment attachment;
+        try {
+            JsonToObject(item, &attachment);
+            if (attachment) {
+                attachments->push_back(std::move(attachment));
+            }
+        } catch (json::Exception& e) {
+            std::cout << "Json exception at `" << e.GetAt()
+                      << "` while extracting an attachment: "
+                      << e.GetMessage() << "\n";
+        }
+    }
+}
+
 template<>
 void JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_api::MessageAPI::Message* object) {
     JsonGetMembers(json,
@@ -11,6 +63,11 @@ void JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_
                    "from_id", &object->from_id,
                    "user_id", &object->user_id,
                    "body", &object->body);
+    auto it = json.FindMember("attachments");
+    if (it != json.MemberEnd()) {
+        auto& attachments = it->value;
+        ParseAttachments(attachments, &object->attachments);
+    }
 }
 
 // This function is needed to avoid a linker error

@@ -5,8 +5,11 @@ add_library("vk-api"
     "src/friends.cpp"
     "src/intervals-manager.cpp"
     "src/messages.cpp"
+    "src/photo-attachment.cpp"
     "src/requests-manager.cpp"
+    "src/sticker-attachment.cpp"
     "src/users.cpp"
+    "src/video-attachment.cpp"
 )
 
 add_subdirectory("test")
