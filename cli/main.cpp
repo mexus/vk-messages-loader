@@ -3,8 +3,9 @@
 
 int main() {
     cli::CliExceptionsHandler exceptions_handler;
-    cli::CommandLineInterface cli;
-    auto execute = std::bind(&cli::CommandLineInterface::Execute, &cli);
-    exceptions_handler.ProcessFunction(execute);
+    exceptions_handler.ProcessFunction([](){
+                                           cli::CommandLineInterface cli;
+                                           cli.Execute();
+                                       });
     return 0;
 }

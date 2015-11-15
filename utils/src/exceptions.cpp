@@ -17,13 +17,24 @@ std::string BasicException::GetMessage() const {
 }
 
 FileException::FileException(const std::string& at, Operation operation, const std::string& file_name)
-        : BasicException(at, "Operation #" + std::to_string(operation) + " has failed on a file '" + file_name + "'"),
+        : BasicException(at, "Operation '" + OperationToString(operation) + "' has failed on a file '" + file_name + "'"),
           operation_(operation),
           file_name_(file_name) {
 }
 
 FileException::Operation FileException::GetOperation() const {
     return operation_;
+}
+
+std::string FileException::OperationToString(Operation operation) {
+    switch(operation) {
+        case READ:
+            return "read";
+        case WRITE:
+            return "write";
+        default:
+            return "unknown";
+    }
 }
 
 std::string FileException::GetFileName() const {

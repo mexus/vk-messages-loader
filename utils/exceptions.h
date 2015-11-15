@@ -31,6 +31,8 @@ public:
 private:
     const Operation operation_;
     const std::string file_name_;
+
+    static std::string OperationToString(Operation operation);
 };
 
 class FileReadException: public FileException {
