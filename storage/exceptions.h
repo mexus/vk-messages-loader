@@ -5,7 +5,7 @@ namespace storage {
 
 class PathException: public util::BasicException {
 public:
-    PathException(const std::string& path);
+    PathException(const std::string& at, const std::string& path);
     std::string GetPath() const;
 
 private:
@@ -14,12 +14,12 @@ private:
 
 class PathIsFileException: public PathException {
 public:
-    PathIsFileException(const std::string& path);
+    PathIsFileException(const std::string& at, const std::string& path);
 };
 
 class PathCreateException: public PathException {
 public:
-    PathCreateException(const std::string& path);
+    PathCreateException(const std::string& at, const std::string& path);
 };
 
 }

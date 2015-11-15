@@ -33,12 +33,12 @@ void HistoryDB::CheckPath() const {
     boost::filesystem::path path(path_);
     if (boost::filesystem::exists(path)) {
         if (!boost::filesystem::is_directory(path)) {
-            throw PathIsFileException(path.string());
+            THROW_AT(PathIsFileException, path.string());
         }
     } else {
         boost::filesystem::create_directories(path);
         if (!boost::filesystem::exists(path)) {
-            throw PathCreateException(path.string());
+            THROW_AT(PathCreateException, path.string());
         }
     }
 }

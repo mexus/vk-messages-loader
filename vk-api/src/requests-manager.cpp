@@ -23,12 +23,12 @@ cpr::Response RequestsManager::GetHttpResponse(const cpr::Url& url, const cpr::P
         long status_code = http_response.status_code;
         if (status_code == 0) {
             if (attempt == max_attempts) {
-                throw RequestException(http_response);
+                THROW_AT(RequestException, http_response);
             }
             ++attempt;
             continue ;
         } else if (status_code != HTTP_CODES::OK) {
-            throw RequestException(http_response);
+            THROW_AT(RequestException, http_response);
         }
         return http_response;
     }
@@ -44,7 +44,7 @@ rapidjson::Document RequestsManager::GetDocument(const cpr::Url& url, const cpr:
         doc.Parse(json.c_str());
         if (doc.HasParseError()) {
             if (attempt == max_attempts) {
-                throw RequestParseException(http_response, doc);
+                THROW_AT(RequestParseException, http_response, doc);
             }
             ++attempt;
             continue;
@@ -52,7 +52,7 @@ rapidjson::Document RequestsManager::GetDocument(const cpr::Url& url, const cpr:
 
         if (!doc.IsObject()) {
             if (attempt == max_attempts) {
-                throw util::json::NotAnObjectException();
+                THROW_AT(util::json::NotAnObjectException);
             }
             ++attempt;
             continue;
@@ -71,7 +71,7 @@ RequestsManager::Response RequestsManager::MakeRequest(const cpr::Url& url, cons
             util::JsonToObject(doc["error"], &vk_error);
             if (HandleVkError(vk_error)) {
                 if (attempt == max_attempts) {
-                   throw ApiException(std::move(vk_error));
+                   THROW_AT(ApiException, std::move(vk_error));
                 }
                 ++attempt;
                 continue;

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cpr.h>
+#include <manager/exceptions.h>
 #include <utils/json.h>
 
 namespace util {
@@ -101,7 +102,7 @@ Token::Data Token::ObtainToken() {
 
 std::string Token::GetAuthUrl() const {
     if (app_id_.empty()) {
-        throw std::runtime_error("No application id information available");
+        THROW_AT(NoApplicationIdException);
     }
     static const std::string
         address("https://oauth.vk.com/authorize"),

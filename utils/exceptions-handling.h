@@ -1,13 +1,14 @@
 #pragma once
-#include <utils/exceptions.h>
+#include <manager/exceptions.h>
 #include <storage/exceptions.h>
+#include <utils/exceptions.h>
 #include <vk-api/exceptions.h>
 
 namespace util{
 
 class ExceptionsHandler {
 public:
-    virtual ~ExceptionsHandler() = default;
+    virtual ~ExceptionsHandler() {}
     virtual void Handle(const util::FileWriteException& e) = 0;
     virtual void Handle(const util::FileReadException& e) = 0;
     virtual void Handle(const util::FileException& e) = 0;
@@ -25,6 +26,8 @@ public:
     virtual void Handle(const vk_api::RequestParseException& e) = 0;
     virtual void Handle(const vk_api::RequestException& e) = 0;
     virtual void Handle(const vk_api::ApiException& e) = 0;
+    virtual void Handle(const manager::NoApplicationIdException& e) = 0;
+    virtual void Handle(const manager::NoTokenException& e) = 0;
     virtual void Handle(const util::BasicException& e) = 0;
     virtual void Handle(const std::runtime_error& e) = 0;
     virtual void Handle(const std::exception& e) = 0;
@@ -67,6 +70,10 @@ public:
         } catch (const vk_api::RequestException& e) {
             Handle(e);
         } catch (const vk_api::ApiException& e) {
+            Handle(e);
+        } catch (const manager::NoApplicationIdException& e) {
+            Handle(e);
+        } catch (const manager::NoTokenException& e) {
             Handle(e);
         } catch (const util::BasicException& e) {
             Handle(e);

@@ -6,12 +6,12 @@ namespace json {
 
 class Exception: public ::util::BasicException {
 public:
-    Exception(const std::string& message);
+    Exception(const std::string& at, const std::string& message);
 };
 
 class TypeException: public Exception {
 public:
-    TypeException(const std::string& type);
+    TypeException(const std::string& at, const std::string& type);
     std::string GetType() const;
 
 private:
@@ -20,7 +20,7 @@ private:
 
 class NoFieldException: public Exception {
 public:
-    NoFieldException(const std::string& field);
+    NoFieldException(const std::string& at, const std::string& field);
     std::string GetField() const;
 
 private:
@@ -29,27 +29,27 @@ private:
 
 class NotAnObjectException: public TypeException {
 public:
-    NotAnObjectException();
+    NotAnObjectException(const std::string& at);
 };
 
 class NotAnArrayException: public TypeException {
 public:
-    NotAnArrayException();
+    NotAnArrayException(const std::string& at);
 };
 
 class TypeStringException: public TypeException {
 public:
-    TypeStringException();
+    TypeStringException(const std::string& at);
 };
 
 class TypeInt64Exception: public TypeException {
 public:
-    TypeInt64Exception();
+    TypeInt64Exception(const std::string& at);
 };
 
 class TypeUInt64Exception: public TypeException {
 public:
-    TypeUInt64Exception();
+    TypeUInt64Exception(const std::string& at);
 };
 
 }

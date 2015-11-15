@@ -8,7 +8,7 @@ namespace vk_api {
 
 class ApiException: public util::BasicException {
 public:
-    ApiException(VkError&& vk_error);
+    ApiException(const std::string& at, VkError&& vk_error);
     const VkError& GetVkError() const;
 
 private:
@@ -17,8 +17,8 @@ private:
 
 class RequestException: public util::BasicException {
 public:
-    RequestException(const cpr::Response& response);
-    RequestException(const cpr::Response& response, const std::string& message);
+    RequestException(const std::string& at, const cpr::Response& response);
+    RequestException(const std::string& at, const cpr::Response& response, const std::string& message);
     std::string GetUrl() const;
     long GetStatusCode() const;
     std::string GetText() const;
@@ -32,7 +32,7 @@ private:
 
 class RequestParseException: public RequestException {
 public:
-    RequestParseException(const cpr::Response& response, const rapidjson::Document& doc);
+    RequestParseException(const std::string& at, const cpr::Response& response, const rapidjson::Document& doc);
     rapidjson::ParseErrorCode GetErrorCode() const;
     size_t GetErrorOffset() const;
 

@@ -56,7 +56,7 @@ namespace util {
 template<class T>
 void JsonToObject(const rapidjson::Value& json, vk_api::List<T>* list) {
     if (!json.IsObject()) {
-        throw util::json::NotAnObjectException();
+        THROW_AT(util::json::NotAnObjectException);
     }
     JsonGetMembers(json,
                    "count", &list->count,

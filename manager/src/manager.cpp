@@ -38,8 +38,9 @@ Manager::Manager(const std::string& config_file)
 Manager::~Manager() {
     try {
         SaveSettings();
-    } catch (const std::runtime_error& e) {
-        std::cerr << "Caught a runtime error while saving the settings: " << e.what() << "\n";
+    } catch (const util::BasicException& e) {
+        std::cerr << "Caught a basic exception at `" << e.GetAt() << "` "
+                  << "while saving settings: " << e.GetMessage() << "\n";
     }
 }
 

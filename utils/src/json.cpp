@@ -62,7 +62,7 @@ void JsonGetMembers(const rapidjson::Value& /*json*/) {
 template<>
 void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object) {
     if (!json.IsString()) {
-        throw json::TypeStringException();
+        THROW_AT(json::TypeStringException);
     }
     *object = std::string(json.GetString(), json.GetStringLength());
 }
@@ -70,7 +70,7 @@ void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object
 template<>
 void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
     if (!json.IsUint64()) {
-        throw json::TypeUInt64Exception();
+        THROW_AT(json::TypeUInt64Exception);
     }
     *object = json.GetUint64();
 }
@@ -78,7 +78,7 @@ void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
 template<>
 void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object) {
     if (!json.IsInt64()) {
-        throw json::TypeInt64Exception();
+        THROW_AT(json::TypeInt64Exception);
     }
     *object = json.GetInt64();
 }
@@ -107,7 +107,7 @@ rapidjson::Value JsonFromObject<time_t>(const time_t& object, JsonAllocator& /*a
 rapidjson::Document JsonFromFile(const std::string& file_name) {
     std::ifstream f(file_name);
     if (!f) {
-        throw FileReadException(file_name);
+        THROW_AT(FileReadException, file_name);
     }
     return JsonFromStream(f);
 }
@@ -115,7 +115,7 @@ rapidjson::Document JsonFromFile(const std::string& file_name) {
 void JsonToFile(const std::string& file_name, const rapidjson::Document& document) {
     std::ofstream f(file_name);
     if (!f) {
-        throw FileWriteException(file_name);
+        THROW_AT(FileWriteException, file_name);
     }
     JsonToStream(f, document);
 }

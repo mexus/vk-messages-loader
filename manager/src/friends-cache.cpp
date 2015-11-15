@@ -11,7 +11,7 @@ FriendsCache::FriendsCache(const std::string& file_name) : file_name_(file_name)
 void FriendsCache::Load() {
     auto doc = util::JsonFromFile(file_name_);
     if (!doc.IsObject()) {
-        throw util::json::NotAnObjectException();
+        THROW_AT(util::json::NotAnObjectException);
     }
     friends_.clear();
     util::JsonGetMember(doc, kJsonField, &friends_);

@@ -7,7 +7,12 @@ History::History(const std::string& file_name) : file_name_(file_name) {
 }
 
 History::~History() {
-    WriteData();
+    try {
+        WriteData();
+    } catch (const util::BasicException& e) {
+        std::cerr << "Caught a basic exception at `" << e.GetAt() << "` "
+                  << "while saving a history data: " << e.GetMessage() << "\n";
+    }
 }
 
 void History::AddMessage(Message&& message) {

@@ -13,7 +13,8 @@ void JsonToObject<vk_api::UsersAPI::User>(const rapidjson::Value& json, vk_api::
 
 namespace vk_api {
 
-NoUsersException::NoUsersException() : util::BasicException("No users received") {
+NoUsersException::NoUsersException(const std::string& at)
+        : util::BasicException(at, "No users received") {
 }
 
 const std::string UsersAPI::kInterfaceName = "users";
@@ -28,7 +29,7 @@ UsersAPI::User UsersAPI::GetUser() {
     std::vector<User> users;
     util::JsonGetMember(reply, "response", &users);
     if (users.empty()) {
-        throw NoUsersException();
+        THROW_AT(NoUsersException);
     }
     return users.front();
 }

@@ -1,5 +1,6 @@
 add_library("manager"
             "src/cli-exceptions-handler.cpp"
+            "src/exceptions.cpp"
             "src/export.cpp"
             "src/friends-cache.cpp"
             "src/manager.cpp"

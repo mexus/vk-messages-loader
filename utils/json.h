@@ -22,7 +22,7 @@ template<> void JsonToObject<time_t>(const rapidjson::Value& json, time_t* objec
 template<class T>
 void JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
     if (!json.IsArray()) {
-        throw json::NotAnArrayException();
+        THROW_AT(json::NotAnArrayException);
     }
     auto size = json.Size();
     object->reserve(static_cast<size_t>(object->size() + size));
@@ -64,11 +64,11 @@ void JsonAddMember(rapidjson::Value* json, const std::string& name, const T& obj
 template<class T>
 void JsonGetMember(const rapidjson::Value& json, const std::string& name, T* object) {
     if (!json.IsObject()) {
-        throw json::NotAnObjectException();
+        THROW_AT(json::NotAnObjectException);
     }
     auto it = json.FindMember(name.c_str());
     if (it == json.MemberEnd()) {
-        throw json::NoFieldException(name);
+        THROW_AT(json::NoFieldException, name);
     }
     JsonToObject(it->value, object);
 }
@@ -94,7 +94,7 @@ void JsonGetMembers(const rapidjson::Value& json);
 template<class T, class... Args>
 void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, json::Optional /*optional*/, Args&&... args) {
     if (!json.IsObject()) {
-        throw json::NotAnObjectException();
+        THROW_AT(json::NotAnObjectException);
     }
     JsonGetMembers(json, std::forward<Args>(args)...);
     try {
@@ -108,7 +108,7 @@ void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* va
 template<class T, class... Args>
 void JsonGetMembers(const rapidjson::Value& json, const std::string& name, T* value, Args&&... args) {
     if (!json.IsObject()) {
-        throw json::NotAnObjectException();
+        THROW_AT(json::NotAnObjectException);
     }
     JsonGetMembers(json, std::forward<Args>(args)...);
     JsonGetMember(json, name, value);

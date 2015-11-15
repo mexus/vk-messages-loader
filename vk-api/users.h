@@ -6,7 +6,7 @@ namespace vk_api {
 
 class NoUsersException: public ::util::BasicException {
 public:
-    NoUsersException();
+    NoUsersException(const std::string& at);
 };
 
 class UsersAPI {

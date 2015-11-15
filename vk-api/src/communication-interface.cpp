@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <cpr.h>
+#include <manager/exceptions.h>
 #include <vk-api/data-types.h>
 
 namespace vk_api {
@@ -17,8 +18,9 @@ CommunicationInterface::CommunicationInterface(const TokenRetrieve& callback)
 
 void CommunicationInterface::UpdateToken() {
     std::string token = token_retrieve_callback_();
-    if (token.empty())
-        throw std::runtime_error("Empty token received");
+    if (token.empty()) {
+        THROW_AT(manager::NoTokenException);
+    }
     access_token_ = token;
 }
 
@@ -26,7 +28,7 @@ RequestsManager::Response CommunicationInterface::SendRequest(const std::string&
     cpr::Url url = GetUrl(interface + "." + method, &params);
     auto doc = requests_manager_.MakeRequest(url, params);
     if (!doc.HasMember("response")) {
-        throw util::json::NoFieldException("response");
+        THROW_AT(util::json::NoFieldException, "response");
     }
     return doc;
 }

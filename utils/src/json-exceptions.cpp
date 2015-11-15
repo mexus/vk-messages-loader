@@ -3,11 +3,12 @@
 namespace util {
 namespace json {
 
-Exception::Exception(const std::string& message) : ::util::BasicException(message) {
+Exception::Exception(const std::string& at, const std::string& message)
+        : BasicException(at, message) {
 }
 
-TypeException::TypeException(const std::string& type)
-        : Exception("json value is of a wrong type, expected: " + type),
+TypeException::TypeException(const std::string& at, const std::string& type)
+        : Exception(at, "json value is of a wrong type, expected: " + type),
           type_(type) {
 }
 
@@ -15,8 +16,8 @@ std::string TypeException::GetType() const {
     return type_;
 }
 
-NoFieldException::NoFieldException(const std::string& field)
-        : Exception("no field '" + field + "' in a json object"),
+NoFieldException::NoFieldException(const std::string& at, const std::string& field)
+        : Exception(at, "no field '" + field + "' in a json object"),
           field_(field) {
 }
 
@@ -24,24 +25,24 @@ std::string NoFieldException::GetField() const {
     return field_;
 }
 
-NotAnObjectException::NotAnObjectException()
-        : TypeException("object") {
+NotAnObjectException::NotAnObjectException(const std::string& at)
+        : TypeException(at, "object") {
 }
 
-NotAnArrayException::NotAnArrayException()
-        : TypeException("array") {
+NotAnArrayException::NotAnArrayException(const std::string& at)
+        : TypeException(at, "array") {
 }
 
-TypeStringException::TypeStringException()
-        : TypeException("string") {
+TypeStringException::TypeStringException(const std::string& at)
+        : TypeException(at, "string") {
 }
 
-TypeInt64Exception::TypeInt64Exception()
-        : TypeException("int64") {
+TypeInt64Exception::TypeInt64Exception(const std::string& at)
+        : TypeException(at, "int64") {
 }
 
-TypeUInt64Exception::TypeUInt64Exception()
-        : TypeException("uint64") {
+TypeUInt64Exception::TypeUInt64Exception(const std::string& at)
+        : TypeException(at, "uint64") {
 }
 
 }
