@@ -10,8 +10,8 @@ History::~History() {
     try {
         WriteData();
     } catch (const util::BasicException& e) {
-        std::cerr << "Caught a basic exception at `" << e.GetAt() << "` "
-                  << "while saving a history data: " << e.GetMessage() << "\n";
+        LOG(ERROR) << "Caught a basic exception at `" << e.GetAt() << "` "
+                   << "while saving a history data: " << e.GetMessage();
     }
 }
 
@@ -28,10 +28,10 @@ void History::LoadData() {
         rapidjson::Document document = util::JsonFromFile(file_name_);
         util::JsonGetMember(document, "data", &data_);
     } catch (const util::FileReadException& e) {
-        std::cout << "Can't read a history file: " << e.GetFileName() << "\n";
+        LOG(ERROR) << "Can't read a history file: " << e.GetFileName();
     } catch (const util::json::Exception& e) {
-        std::cerr << "Caught a json exception while reading a history file '" << file_name_<< "': "
-                  << e.what() << ". The history file will be overwritten on save.\n";
+        LOG(ERROR) << "Caught a json exception while reading a history file '" << file_name_<< "': "
+                   << e.what() << ". The history file will be overwritten on save.";
     }
 }
 

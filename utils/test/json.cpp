@@ -5,6 +5,7 @@
 #include <utils/json.h>
 
 using namespace util;
+INITIALIZE_EASYLOGGINGPP
 
 BOOST_AUTO_TEST_SUITE(utils_json)
 

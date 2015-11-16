@@ -58,11 +58,11 @@ std::vector<FriendsAPI::Friend> FriendsAPI::GetFriends() {
         try {
             util::JsonGetMember(doc, "response", &response);
         } catch (util::json::Exception& e) {
-            std::cerr << "Unable to convert response to a list of friends: " << e.what() << "\n";
+            LOG(ERROR) << "Unable to convert response to a list of friends: " << e.what();
             break ;
         }
         size_t count = response.items.size();
-        std::cout << "Received " << count << " friends out of " << response.count << "\n";
+        LOG(DEBUG) << "Received " << count << " friends out of " << response.count;
         offset += count;
         total_friends.insert(total_friends.end(),
                              std::make_move_iterator(response.items.begin()),

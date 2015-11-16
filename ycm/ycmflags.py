@@ -13,6 +13,7 @@ class YcmFlags:
             '-I', './',
             '-I', './3rd-party/cpr/include/',
             '-I', './3rd-party/rapidjson/include/',
+            '-I', './3rd-party/easyloggingpp/src/',
         ]
         self.project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.compilation_database_folder = os.path.join(self.project_path, 'build/')

@@ -20,7 +20,7 @@ SET(ENV{BUILD_CPR_TESTS} OFF)
 
 add_subdirectory("3rd-party/cpr")
 include_directories(${CPR_INCLUDE_DIRS})
-message(${CPR_INCLUDE_DIRS})
+include_directories("3rd-party/easyloggingpp/src")
 
 add_subdirectory("vk-api")
 add_subdirectory("storage")

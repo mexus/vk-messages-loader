@@ -36,16 +36,15 @@ Token::Token(const std::string& app_id, const std::string& file_name)
     try {
         LoadData();
     } catch (const util::FileReadException& e) {
-        std::cout << "Can't load token data from " << e.GetFileName() << "\n";
+        LOG(ERROR) << "Can't load token data from " << e.GetFileName();
+    } catch (const util::json::Exception& e) {
+        LOG(ERROR) << "Json parsing of '" << file_name << "' failed at `"
+                   << e.GetAt() << "`: " << e.GetMessage();
     }
 }
 
 void Token::LoadData() {
     auto doc = util::JsonFromFile(file_name_);
-    if (!doc.IsObject()) {
-        std::cerr << "Json document is not an object\n";
-        return ;
-    }
     util::JsonGetMember(doc, kFieldName, &data_);
 }
 
@@ -67,7 +66,7 @@ std::string Token::GetToken() {
             try {
                 SaveData();
             } catch (const std::runtime_error& e) {
-                std::cerr << "Caught a runtime error while saving the data: " << e.what() << "\n";
+                LOG(ERROR) << "Caught a runtime error while saving the data: " << e.what();
             }
         }
     }
@@ -84,13 +83,14 @@ Token::Data Token::ObtainToken() {
     static const std::string needle = "access_token=";
     size_t begin = url.find(needle);
     if (begin == std::string::npos) {
-        std::cerr << "Can't find 'access_token'\n";
+        LOG(WARNING) << "Can't find 'access_token'";
         return {};
     }
     begin += needle.length();
     size_t end = url.find('&', begin);
-    if (end == std::string::npos)
+    if (end == std::string::npos) {
         end = url.length();
+    }
     std::string token = url.substr(begin, end - begin);
     std::cout << "Token is: [" << token << "]\n";
 

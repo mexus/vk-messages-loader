@@ -1,6 +1,8 @@
 #include "cli-exceptions-handler.h"
 #include "cli.h"
 
+INITIALIZE_EASYLOGGINGPP
+
 int main() {
     cli::CliExceptionsHandler exceptions_handler;
     exceptions_handler.ProcessFunction([](){

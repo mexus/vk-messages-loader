@@ -30,7 +30,7 @@ void JsonToObject<Attachment>(const rapidjson::Value& json, Attachment* attachme
         JsonGetMember(json, "sticker", sticker);
         attachment->reset(sticker);
     } else {
-        std::cerr << "Unknown type " << type << "\n";
+        LOG(WARNING) << "Unknown type " << type;
     }
 }
 
@@ -48,9 +48,9 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
                 attachments->push_back(std::move(attachment));
             }
         } catch (json::Exception& e) {
-            std::cout << "Json exception at `" << e.GetAt()
-                      << "` while extracting an attachment: "
-                      << e.GetMessage() << "\n";
+            LOG(ERROR) << "Json exception at `" << e.GetAt()
+                       << "` while extracting an attachment: "
+                       << e.GetMessage();
         }
     }
 }
@@ -115,7 +115,7 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
             auto reply = vk_interface_->SendRequest(kInterfaceName, "getHistory", std::move(params));
             doc = std::move(reply);
         } catch (const util::BasicException& e) {
-            std::cerr << "Caught an exception during a request: " << e.what() << "\n";
+            LOG(ERROR) << "Caught an exception during a request: " << e.what();
             break ;
         }
 
@@ -123,7 +123,7 @@ std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint6
         try {
             util::JsonGetMember(doc, "response", &response);
         } catch (util::json::Exception& e) {
-            std::cerr << "Unable to convert a response to a list of messages: " << e.what() << "\n";
+            LOG(ERROR) << "Unable to convert a response to a list of messages: " << e.what();
             break ;
         }
         size_t received = response.items.size();

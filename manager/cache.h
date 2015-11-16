@@ -24,8 +24,8 @@ public:
         try {
             Save();
         } catch (const util::BasicException& e) {
-            std::cerr << "Caught an exception at `" << e.GetAt() << "` "
-                      << "while saving a data: " << e.GetMessage() << "\n";
+            LOG(ERROR) << "Caught an exception at `" << e.GetAt() << "` "
+                       << "while saving a data: " << e.GetMessage() << "\n";
         }
     }
 
@@ -71,8 +71,8 @@ public:
                 util::JsonToObject(json_vector[i], &data);
                 AddData(std::move(data));
             } catch (const util::json::Exception& e) {
-                std::cout << i << "-th element of an array can not be converted to a 'User': "
-                          << e.what() << "\n";
+                LOG(ERROR) << i << "-th element of an array can not be converted to a 'User': "
+                           << e.what();
             }
         }
     }

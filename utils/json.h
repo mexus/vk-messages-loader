@@ -2,9 +2,9 @@
 
 #include <cinttypes>
 #include <type_traits>
-#include <iostream>
 #include <string>
 #include <vector>
+#include <easylogging++.h>
 #include <rapidjson/document.h>
 #include "json-exceptions.h"
 
@@ -33,7 +33,7 @@ void JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
             JsonToObject(item, &new_object);
             object->push_back(std::move(new_object));
         } catch (const json::Exception& e) {
-            std::cerr << "Can't convert item #" << i << " to object: " << e.what() << "\n";
+            LOG(WARNING) << "Can't convert item #" << i << " to object: " << e.what();
         }
     }
 }

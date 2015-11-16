@@ -11,6 +11,8 @@
 #undef private
 #include <storage/exceptions.h>
 
+INITIALIZE_EASYLOGGINGPP
+
 namespace {
 
 struct Dir {
@@ -65,7 +67,6 @@ BOOST_AUTO_TEST_CASE(ok) {
 BOOST_AUTO_TEST_CASE(file_exists) {
     File file;
     HistoryDB storage(file.path.string());
-    std::cout << "Expecting an error regarding " << file.path << std::endl;
     BOOST_CHECK_EXCEPTION(storage.CheckPath(),
                           PathIsFileException,
                           [&file](const PathIsFileException& e) {

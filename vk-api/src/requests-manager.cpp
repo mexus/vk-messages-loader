@@ -20,9 +20,11 @@ cpr::Response RequestsManager::GetHttpResponse(const cpr::Url& url, const cpr::P
     while (true) {
         intervals_manager_.Wait();
         auto http_response = cpr::Get(url, parameters, cpr::Timeout(request_timeout.count()));
+        LOG(DEBUG) << http_response.url;
         long status_code = http_response.status_code;
         if (status_code == 0) {
             if (attempt == max_attempts) {
+                LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << ")";
                 THROW_AT(RequestException, http_response);
             }
             ++attempt;
@@ -44,6 +46,8 @@ rapidjson::Document RequestsManager::GetDocument(const cpr::Url& url, const cpr:
         doc.Parse(json.c_str());
         if (doc.HasParseError()) {
             if (attempt == max_attempts) {
+                LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << "), "
+                           << "json text: " << json;
                 THROW_AT(RequestParseException, http_response, doc);
             }
             ++attempt;
@@ -52,6 +56,8 @@ rapidjson::Document RequestsManager::GetDocument(const cpr::Url& url, const cpr:
 
         if (!doc.IsObject()) {
             if (attempt == max_attempts) {
+                LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << "), "
+                           << "json text: " << json;
                 THROW_AT(util::json::NotAnObjectException);
             }
             ++attempt;
@@ -71,6 +77,7 @@ RequestsManager::Response RequestsManager::MakeRequest(const cpr::Url& url, cons
             util::JsonToObject(doc["error"], &vk_error);
             if (HandleVkError(vk_error)) {
                 if (attempt == max_attempts) {
+                   LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << ")";
                    THROW_AT(ApiException, std::move(vk_error));
                 }
                 ++attempt;

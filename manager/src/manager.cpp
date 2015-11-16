@@ -21,12 +21,12 @@ Manager::Manager(const std::string& config_file)
     try {
         users_cache_.Load();
     } catch (const util::FileReadException& e) {
-        std::cout << "Can't load users cache from file " << e.GetFileName() << "\n";
+        LOG(WARNING) << "Can't load users cache from file " << e.GetFileName();
     }
     try {
         friends_cache_.Load();
     } catch (const util::FileReadException& e) {
-        std::cout << "Can't load friends cache from file " << e.GetFileName() << "\n";
+        LOG(WARNING) << "Can't load friends cache from file " << e.GetFileName();
     }
     vk_api::UsersAPI users_api(&vk_interface_);
     auto user = users_api.GetUser();
@@ -38,8 +38,8 @@ Manager::~Manager() {
     try {
         SaveSettings();
     } catch (const util::BasicException& e) {
-        std::cerr << "Caught an application exception at `" << e.GetAt() << "` "
-                  << "while saving settings: " << e.GetMessage() << "\n";
+        LOG(ERROR) << "Caught an application exception at `" << e.GetAt() << "` "
+                   << "while saving settings: " << e.GetMessage() << "\n";
     }
 }
 
@@ -49,7 +49,7 @@ Settings Manager::LoadSettings( const std::string& file_name) {
         auto doc = util::JsonFromFile(file_name);
         util::JsonGetMember(doc, kSettingsField, &settings);
     } catch (const util::FileReadException& e) {
-        std::cout << "Can't load settings from file " << e.GetFileName() << "\n";
+        LOG(ERROR) << "Can't load settings from file " << e.GetFileName();
     }
     return settings;
 }

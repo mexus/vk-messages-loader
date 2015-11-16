@@ -9,7 +9,6 @@ BOOST_AUTO_TEST_SUITE(history)
 
 BOOST_AUTO_TEST_CASE(messages_handling) {
     std::string file_name("fake-file-name");
-    std::cout << "Expecting a warning regarding '" << file_name << "'" << std::endl;
     History history(file_name);
     const std::vector<Message> etalon_messages;
     for (auto& msg: etalon_messages) {
