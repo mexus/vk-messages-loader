@@ -7,7 +7,6 @@ struct Settings {
     std::string application_id;
     std::string storage_path;
     std::vector<uint64_t> users;
-    std::vector<uint64_t> friends;
 };
 
 }

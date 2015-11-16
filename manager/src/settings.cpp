@@ -10,8 +10,7 @@ void JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Sett
     JsonGetMembers(json,
                    "application_id", &object->application_id,
                    "storage_path", &object->storage_path,
-                   "users", &object->users, util::json::Optional{},
-                   "friends", &object->friends, util::json::Optional{});
+                   "users", &object->users, util::json::Optional{});
 }
 
 template<>
@@ -20,8 +19,7 @@ rapidjson::Value JsonFromObject<manager::Settings>(const manager::Settings& obje
     JsonAddMembers(&json, allocator,
                               "application_id", object.application_id,
                               "storage_path", object.storage_path,
-                              "users", object.users,
-                              "friends", object.friends);
+                              "users", object.users);
     return json;
 }
 
