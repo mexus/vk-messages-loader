@@ -3,7 +3,10 @@
 
 namespace cli {
 
-CommandLineInterface::CommandLineInterface() : manager_("config.data") {
+CommandLineInterface::CommandLineInterface(manager::Settings* settings)
+        : settings_(settings),
+          callbacks_(settings_->GetApplicationId(), settings_->GetStoragePath() + "/token.data"),
+          manager_(settings_, &callbacks_) {
 }
 
 bool CommandLineInterface::InputYesOrNo(const std::string& question) {

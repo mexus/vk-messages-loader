@@ -72,6 +72,16 @@ void CliExceptionsHandler::Handle(const storage::PathException& e) {
               << e.GetPath() << "': " << e.what();
 }
 
+void CliExceptionsHandler::Handle(const vk_api::CaptchaException& e) {
+    auto& s = LOG(ERROR) << "At `" << e.GetAt() << "`: " << "Captha parameter(s) is(are) missing: ";
+    if (e.NoId()) {
+        s << "identificator ";
+    }
+    if (e.NoImage()) {
+        s << "image url ";
+    }
+}
+
 void CliExceptionsHandler::Handle(const vk_api::RequestParseException& e) {
     LOG(ERROR) << "At `" << e.GetAt() << "`: " << "Json parsing error #" << e.GetErrorCode() << " at position "
               << e.GetErrorOffset() << " while parsing a response for " << e.GetUrl()

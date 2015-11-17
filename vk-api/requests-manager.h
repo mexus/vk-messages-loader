@@ -11,15 +11,15 @@ class RequestsManager {
 public:
     using Response = rapidjson::Document;
 
-    RequestsManager() = default;
+    RequestsManager();
     Response MakeRequest(const cpr::Url& url, const cpr::Parameters& parameters);
+    void IncreaseInterval();
 
 private:
     IntervalsManager intervals_manager_;
 
     rapidjson::Document GetDocument(const cpr::Url& url, const cpr::Parameters& parameters);
     cpr::Response GetHttpResponse(const cpr::Url& url, const cpr::Parameters& parameters);
-    bool HandleVkError(const VkError& vk_error);
 
 };
 

@@ -7,16 +7,12 @@
 
 namespace manager {
 
-const std::string Manager::kSettingsField = "settings";
-
-Manager::Manager(const std::string& config_file)
-        : config_file_(config_file),
-          settings_(LoadSettings(config_file)),
-          token_(settings_.application_id, settings_.storage_path + "/token.data"),
-          vk_interface_(std::bind(&Token::GetToken, token_)),
-          history_db_(settings_.storage_path + "/messages"),
-          users_cache_(settings_.storage_path + "/users.cache"),
-          friends_cache_(settings_.storage_path + "/friends.cache"),
+Manager::Manager(Settings* settings, vk_api::Callbacks* callbacks)
+        : settings_(settings),
+          vk_interface_(callbacks),
+          history_db_(settings_->GetStoragePath() + "/messages"),
+          users_cache_(settings_->GetStoragePath() + "/users.cache"),
+          friends_cache_(settings_->GetStoragePath() + "/friends.cache"),
           history_export_(users_cache_) {
     try {
         users_cache_.Load();
@@ -35,36 +31,12 @@ Manager::Manager(const std::string& config_file)
 }
 
 Manager::~Manager() {
-    try {
-        SaveSettings();
-    } catch (const util::BasicException& e) {
-        LOG(ERROR) << "Caught an application exception at `" << e.GetAt() << "` "
-                   << "while saving settings: " << e.GetMessage() << "\n";
-    }
-}
-
-Settings Manager::LoadSettings( const std::string& file_name) {
-    Settings settings;
-    try {
-        auto doc = util::JsonFromFile(file_name);
-        util::JsonGetMember(doc, kSettingsField, &settings);
-    } catch (const util::FileReadException& e) {
-        LOG(ERROR) << "Can't load settings from file " << e.GetFileName();
-    }
-    return settings;
-}
-
-void Manager::SaveSettings() const {
-    rapidjson::Document doc;
-    doc.SetObject();
-    auto& allocator = doc.GetAllocator();
-    util::JsonAddMember(&doc, kSettingsField, settings_, allocator);
-    util::JsonToFile(config_file_, doc);
 }
 
 void Manager::UpdateMessages() {
     vk_api::MessageAPI messages_api(&vk_interface_);
-    for (auto& user_id: settings_.users) {
+    auto users = settings_->GetUsers();
+    for (auto& user_id: users) {
         auto history = history_db_.GetUser(user_id);
         uint64_t last_message_id = history->LastMessageId();
         auto messages = messages_api.GetMessages(user_id, last_message_id);
@@ -108,24 +80,26 @@ std::vector<vk_api::FriendsAPI::Friend> Manager::GetFriends() const {
 }
 
 std::vector<uint64_t> Manager::GetActiveUsers() const {
-    return settings_.users;
+    return settings_->GetUsers();
 }
 
 void Manager::AddActiveUser(uint64_t user_id) {
-    auto it = std::find_if(settings_.users.begin(),
-                           settings_.users.end(),
+    auto& users = settings_->GetUsers();
+    auto it = std::find_if(users.begin(),
+                           users.end(),
                            [user_id](const uint64_t& user){return user_id == user;});
-    if (it == settings_.users.end()) {
-        settings_.users.push_back(user_id);
+    if (it == users.end()) {
+        users.push_back(user_id);
     }
 }
 
 void Manager::ExportHistory() {
-    auto path = boost::filesystem::path(settings_.storage_path) / "exported/";
+    auto path = boost::filesystem::path(settings_->GetStoragePath()) / "exported/";
     if (!boost::filesystem::exists(path)) {
         boost::filesystem::create_directory(path);
     }
-    for (auto& user_id: settings_.users) {
+    auto users = settings_->GetUsers();
+    for (auto& user_id: users) {
         std::string user_path = (path / std::to_string(user_id)).string();
         auto user_history = history_db_.GetUser(user_id);
         history_export_.ExportToFile(user_history, user_path);

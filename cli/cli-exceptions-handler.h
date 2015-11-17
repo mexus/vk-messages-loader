@@ -18,6 +18,7 @@ class CliExceptionsHandler: public util::ExceptionsHandler {
     void Handle(const storage::PathCreateException& e) override;
     void Handle(const storage::PathIsFileException& e) override;
     void Handle(const storage::PathException& e) override;
+    void Handle(const vk_api::CaptchaException& e) override;
     void Handle(const vk_api::RequestParseException& e) override;
     void Handle(const vk_api::RequestException& e) override;
     void Handle(const vk_api::ApiException& e) override;

@@ -23,6 +23,7 @@ public:
     virtual void Handle(const storage::PathCreateException& e) = 0;
     virtual void Handle(const storage::PathIsFileException& e) = 0;
     virtual void Handle(const storage::PathException& e) = 0;
+    virtual void Handle(const vk_api::CaptchaException& e) = 0;
     virtual void Handle(const vk_api::RequestParseException& e) = 0;
     virtual void Handle(const vk_api::RequestException& e) = 0;
     virtual void Handle(const vk_api::ApiException& e) = 0;
@@ -66,6 +67,8 @@ public:
         } catch (const storage::PathIsFileException& e) {
             Handle(e);
         } catch (const storage::PathException& e) {
+            Handle(e);
+        } catch (const vk_api::CaptchaException& e) {
             Handle(e);
         } catch (const vk_api::RequestParseException& e) {
             Handle(e);

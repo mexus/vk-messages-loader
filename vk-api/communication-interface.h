@@ -1,11 +1,11 @@
 #pragma once
 #include <functional>
-// #include <future>
 #include <map>
 #include <memory>
 #include <string>
 #include <cpr.h>
 
+#include "callbacks.h"
 #include "data-types.h"
 #include "requests-manager.h"
 
@@ -13,21 +13,25 @@ namespace vk_api {
 
 class CommunicationInterface {
 public:
-    typedef std::function<std::string()> TokenRetrieve;
+    CommunicationInterface(Callbacks* callbacks);
 
-    CommunicationInterface(const TokenRetrieve& callback);
-
-    void UpdateToken();
     RequestsManager::Response SendRequest(const std::string& interface, const std::string& method,
-                                          cpr::Parameters&& params);
+                                          const cpr::Parameters& params);
 
 private:
-    const TokenRetrieve token_retrieve_callback_;
+    struct CaptchaData {
+        std::string id;
+        std::string key;
+    };
+
+    Callbacks* callbacks_;
     RequestsManager requests_manager_;
-    std::string access_token_;
+    CaptchaData captcha_data_;
 
+    cpr::Parameters AddCaptcha(const cpr::Parameters& params);
     cpr::Url GetUrl(const std::string& method_name, cpr::Parameters* params);
-
+    bool HandleVkError(const VkError& vk_error);
+    void HandleCaptcha(const std::map<std::string, std::string>& data);
 };
 
 }

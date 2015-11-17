@@ -13,6 +13,9 @@ enum HTTP_CODES {
 
 namespace vk_api {
 
+RequestsManager::RequestsManager() {
+}
+
 cpr::Response RequestsManager::GetHttpResponse(const cpr::Url& url, const cpr::Parameters& parameters) {
     static const std::chrono::milliseconds request_timeout(1000);
     static const unsigned max_attempts = 3;
@@ -68,37 +71,17 @@ rapidjson::Document RequestsManager::GetDocument(const cpr::Url& url, const cpr:
 }
 
 RequestsManager::Response RequestsManager::MakeRequest(const cpr::Url& url, const cpr::Parameters& parameters) {
-    static const unsigned max_attempts = 3;
-    unsigned attempt = 0;
-    while (true) {
-        auto doc = GetDocument(url, parameters);
-        if (doc.HasMember("error")){
-            VkError vk_error;
-            util::JsonToObject(doc["error"], &vk_error);
-            if (HandleVkError(vk_error)) {
-                if (attempt == max_attempts) {
-                   LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << ")";
-                   THROW_AT(ApiException, std::move(vk_error));
-                }
-                ++attempt;
-                continue;
-            }
-        }
-        return doc;
+    auto doc = GetDocument(url, parameters);
+    if (doc.HasMember("error")){
+        VkError vk_error;
+        util::JsonToObject(doc["error"], &vk_error);
+        THROW_AT(ApiException, std::move(vk_error));
     }
+    return doc;
 }
 
-bool RequestsManager::HandleVkError(const VkError& vk_error) {
-    switch (vk_error.error_code) {
-        case VK_ERRORS::TOO_FAST_QUERIES:
-            intervals_manager_.IncreaseInterval();
-            return true;
-        case VK_ERRORS::CAPTURE_REQUIRED:
-            // TODO: handle a capture
-            // for now just fall back to default
-        default:
-            return false;
-    }
+void RequestsManager::IncreaseInterval() {
+    intervals_manager_.IncreaseInterval();
 }
 
 }

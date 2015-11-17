@@ -53,4 +53,18 @@ size_t RequestParseException::GetErrorOffset() const {
     return error_offset_;
 }
 
+CaptchaException::CaptchaException(const std::string& at, bool no_id, bool no_img)
+        : util::BasicException(at, "Captcha parameters are missing"),
+          no_id_(no_id),
+          no_img_(no_img) {
+}
+
+bool CaptchaException::NoId() const {
+    return no_id_;
+}
+
+bool CaptchaException::NoImage() const {
+    return no_img_;
+}
+
 }

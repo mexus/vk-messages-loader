@@ -52,52 +52,59 @@ void Token::SaveData() const {
     rapidjson::Document doc;
     doc.SetObject();
     auto& allocator = doc.GetAllocator();
-    util::JsonAddMember(&doc, kFieldName, data_, allocator);
-    util::JsonToFile(file_name_, doc);
+    try {
+        util::JsonAddMember(&doc, kFieldName, data_, allocator);
+        util::JsonToFile(file_name_, doc);
+    } catch (const util::BasicException& e) {
+        LOG(ERROR) << "Caught a basic exception at `" << e.GetAt() << "` "
+                   << "while saving the data: " << e.GetMessage();
+    }
 }
 
 std::string Token::GetToken() {
     static const time_t reserve_seconds = 3600;
 
     if (data_.access_token.empty() || data_.expire_at <= std::time(nullptr) + reserve_seconds) {
-        auto token = ObtainToken();
-        if (!token.access_token.empty()) {
-            data_ = token;
-            try {
-                SaveData();
-            } catch (const std::runtime_error& e) {
-                LOG(ERROR) << "Caught a runtime error while saving the data: " << e.what();
-            }
+        auto temp = ObtainToken();
+        if (temp.access_token.empty()) {
+            THROW_AT(NoTokenException);
         }
+        data_ = std::move(temp);
+        SaveData();
     }
     return data_.access_token;
 }
 
-Token::Data Token::ObtainToken() {
-    std::string auth_url = GetAuthUrl();
-    std::cout << "Visit " << auth_url << " and paste URL to which you will be redirected here\n";
-    std::string url;
-    std::cin >> url;
-    std::cout << "Processing [" << url << "]\n";
-
-    static const std::string needle = "access_token=";
-    size_t begin = url.find(needle);
+std::string Token::ExtractValue(const std::string& url, const std::string& parameter) {
+    size_t begin = url.find(parameter);
     if (begin == std::string::npos) {
-        LOG(WARNING) << "Can't find 'access_token'";
+        LOG(WARNING) << "Can't find '" << parameter << "' parameter in url `" << url << "`";
         return {};
     }
-    begin += needle.length();
+    begin += parameter.length();
     size_t end = url.find('&', begin);
     if (end == std::string::npos) {
         end = url.length();
     }
-    std::string token = url.substr(begin, end - begin);
-    std::cout << "Token is: [" << token << "]\n";
+    return url.substr(begin, end - begin);
+}
 
-    // FIXME
-    // Extract expiration data from URI (expires_in=...)
-    Data data{token, std::time(nullptr) + 86400};
+Token::Data Token::ProcessUrl(const std::string& url) {
+    std::string token = ExtractValue(url, "access_token=");
+    LOG(DEBUG) << "Token is: [" << token << "]";
+
+    unsigned int duration_sec = 86400;
+    std::string duration = ExtractValue(url, "expires_in=");
+    if (!duration.empty()) {
+        duration_sec = std::stoul(duration);
+    }
+    Data data{token, std::time(nullptr) + duration_sec};
     return data;
+}
+
+Token::Data Token::ObtainToken() {
+    std::string token_url = GetTokenUrl(GetAuthUrl());
+    return ProcessUrl(token_url);
 }
 
 std::string Token::GetAuthUrl() const {

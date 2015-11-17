@@ -41,4 +41,16 @@ private:
     const size_t error_offset_;
 };
 
+class CaptchaException: public util::BasicException {
+public:
+    CaptchaException(const std::string& at, bool no_id, bool no_img);
+
+    bool NoId() const;
+    bool NoImage() const;
+
+private:
+    bool no_id_;
+    bool no_img_;
+};
+
 }
