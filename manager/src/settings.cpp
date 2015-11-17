@@ -4,9 +4,6 @@ namespace util {
 
 template<>
 void JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Settings* object) {
-    if (!json.IsObject()) {
-        THROW_AT(util::json::NotAnObjectException);
-    }
     JsonGetMembers(json,
                    "application_id", &object->application_id_,
                    "storage_path", &object->storage_path_,

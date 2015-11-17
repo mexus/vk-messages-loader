@@ -25,7 +25,7 @@ public:
             Save();
         } catch (const util::BasicException& e) {
             LOG(ERROR) << "Caught an exception at `" << e.GetAt() << "` "
-                       << "while saving a data: " << e.GetMessage() << "\n";
+                       << "while saving a data: " << e.GetMessage();
         }
     }
 
