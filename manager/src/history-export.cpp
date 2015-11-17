@@ -1,6 +1,7 @@
 #include <manager/history-export.h>
 #include <fstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <stdexcept>
 
 namespace manager {
 
@@ -53,6 +54,7 @@ std::string HistoryExport::AttachmentTypeToString(storage::AttachmentType attach
         case storage::STICKER:
             return "sticker";
     }
+    throw std::logic_error("Looks like unimplemented enumerator has been encountered");
 }
 
 }
