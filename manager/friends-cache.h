@@ -6,9 +6,9 @@
 namespace manager {
 namespace cache {
 
-typedef MappedCache<vk_api::FriendsAPI::Friend> FriendsCache;
+typedef MappedCache<vk_api::User> FriendsCache;
 
-template<> uint64_t GetIdentificator<vk_api::FriendsAPI::Friend>(const vk_api::FriendsAPI::Friend& data);
+template<> uint64_t GetIdentificator<vk_api::User>(const vk_api::User& data);
 
 }
 }

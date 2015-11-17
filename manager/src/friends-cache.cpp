@@ -4,7 +4,7 @@ namespace manager {
 namespace cache {
 
 template<>
-uint64_t GetIdentificator<vk_api::FriendsAPI::Friend>(const vk_api::FriendsAPI::Friend& data) {
+uint64_t GetIdentificator<>(const vk_api::User& data) {
     return data.user_id;
 }
 

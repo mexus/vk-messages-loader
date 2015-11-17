@@ -3,7 +3,7 @@
 
 namespace util {
 
-using Attachments = decltype(vk_api::MessageAPI::Message::attachments);
+using Attachments = decltype(vk_api::Message::attachments);
 using Attachment = Attachments::value_type;
 
 template<>
@@ -56,7 +56,7 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
 }
 
 template<>
-void JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_api::MessageAPI::Message* object) {
+void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
     JsonGetMembers(json,
                    "id", &object->id,
                    "date", &object->date,
@@ -72,10 +72,10 @@ void JsonToObject<vk_api::MessageAPI::Message>(const rapidjson::Value& json, vk_
 
 // This function is needed to avoid a linker error
 template<>
-void JsonToObject<vk_api::List<vk_api::MessageAPI::Message>>(const rapidjson::Value& json, vk_api::List<vk_api::MessageAPI::Message>* object) {
+void JsonToObject<vk_api::List<vk_api::Message>>(const rapidjson::Value& json, vk_api::List<vk_api::Message>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
-    JsonToObject<vk_api::MessageAPI::Message>(json, object);
+    JsonToObject<vk_api::Message>(json, object);
 }
 
 }
@@ -87,9 +87,9 @@ const std::string MessageAPI::kInterfaceName = "messages";
 MessageAPI::MessageAPI(CommunicationInterface* interface) : vk_interface_(interface) {
 }
 
-std::vector<MessageAPI::Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_message_id, uint64_t total_count) {
+std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_message_id, uint64_t total_count) {
     static const unsigned max_messages_per_request = 200;
-    std::vector<MessageAPI::Message> total_messages;
+    std::vector<Message> total_messages;
     cpr::Parameters const_params {
             {"user_id", std::to_string(user_id)}
         };

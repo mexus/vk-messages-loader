@@ -14,10 +14,10 @@ UsersAPI::UsersAPI(CommunicationInterface* vk_interface)
         : vk_interface_(vk_interface) {
 }
 
-FriendsAPI::Friend UsersAPI::GetUser() {
+User UsersAPI::GetUser() {
     auto reply = vk_interface_->SendRequest(kInterfaceName, "get", {{"fields", "uid,first_name,last_name"}});
 
-    std::vector<FriendsAPI::Friend> users;
+    std::vector<User> users;
     util::JsonGetMember(reply, "response", &users);
     if (users.empty()) {
         THROW_AT(NoUsersException);

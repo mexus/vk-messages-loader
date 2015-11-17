@@ -19,7 +19,7 @@ public:
     void UpdateFriends();
     void UpdateMessages();
 
-    std::vector<vk_api::FriendsAPI::Friend> GetFriends() const;
+    std::vector<vk_api::User> GetFriends() const;
     std::vector<uint64_t> GetActiveUsers() const;
     void AddActiveUser(uint64_t id);
     void ExportHistory();

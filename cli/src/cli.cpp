@@ -24,7 +24,7 @@ bool CommandLineInterface::InputYesOrNo(const std::string& question) {
     }
 }
 
-void CommandLineInterface::PrintFriends(const std::vector<vk_api::FriendsAPI::Friend>& friends) {
+void CommandLineInterface::PrintFriends(const std::vector<vk_api::User>& friends) {
     size_t i = 0;
     for (auto& user: friends) {
         std::cout << ++i << ". " << user.user_id << " user: " << user.first_name << " " << user.last_name << "\n";
@@ -46,7 +46,7 @@ void CommandLineInterface::PrintActiveUsers() const {
     }
 }
 
-void CommandLineInterface::AddActiveUser(const std::vector<vk_api::FriendsAPI::Friend>& friends) {
+void CommandLineInterface::AddActiveUser(const std::vector<vk_api::User>& friends) {
     std::cout << "Enter a friends's number from the list above (the first one, not `id`): ";
     size_t index;
     std::cin >> index;
@@ -81,10 +81,3 @@ void CommandLineInterface::Execute() {
 }
 
 }
-
-/*
-int main() {
-    exceptions_handler.ProcessFunction(Flow);
-    return 0;
-}
-*/

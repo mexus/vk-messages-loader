@@ -75,7 +75,7 @@ void Manager::UpdateFriends() {
     friends_cache_.Save();
 }
 
-std::vector<vk_api::FriendsAPI::Friend> Manager::GetFriends() const {
+std::vector<vk_api::User> Manager::GetFriends() const {
     return friends_cache_.GetDataAsVector();
 }
 

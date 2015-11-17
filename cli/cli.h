@@ -17,10 +17,10 @@ private:
     manager::Manager manager_;
 
     void PrintActiveUsers() const;
-    void AddActiveUser(const std::vector<vk_api::FriendsAPI::Friend>& friends);
+    void AddActiveUser(const std::vector<vk_api::User>& friends);
 
     static bool InputYesOrNo(const std::string& question);
-    static void PrintFriends(const std::vector<vk_api::FriendsAPI::Friend>& friends);
+    static void PrintFriends(const std::vector<vk_api::User>& friends);
 };
 
 }
