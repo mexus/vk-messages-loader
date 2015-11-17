@@ -5,7 +5,7 @@
 namespace util {
 
 template<>
-void JsonToObject<storage::Attachment>(const rapidjson::Value& json, storage::Attachment* object) {
+void JsonToObject<>(const rapidjson::Value& json, storage::Attachment* object) {
     uint64_t type;
     JsonGetMembers(json,
                    "type", &type,
@@ -14,7 +14,7 @@ void JsonToObject<storage::Attachment>(const rapidjson::Value& json, storage::At
 }
 
 template<>
-rapidjson::Value JsonFromObject<storage::Attachment>(const storage::Attachment& object, JsonAllocator& allocator) {
+rapidjson::Value JsonFromObject<>(const storage::Attachment& object, JsonAllocator& allocator) {
     rapidjson::Value json(rapidjson::kObjectType);
     JsonAddMembers(&json, allocator,
                   "type", static_cast<uint64_t>(object.type),
@@ -23,7 +23,7 @@ rapidjson::Value JsonFromObject<storage::Attachment>(const storage::Attachment& 
 }
 
 template<>
-void JsonToObject<storage::Message>(const rapidjson::Value& json, storage::Message* object) {
+void JsonToObject<>(const rapidjson::Value& json, storage::Message* object) {
     JsonGetMembers(json,
                    "message_id", &object->message_id,
                    "date", &object->date,
@@ -34,7 +34,7 @@ void JsonToObject<storage::Message>(const rapidjson::Value& json, storage::Messa
 }
 
 template<>
-rapidjson::Value JsonFromObject<storage::Message>(const storage::Message& object, JsonAllocator& allocator) {
+rapidjson::Value JsonFromObject<>(const storage::Message& object, JsonAllocator& allocator) {
     rapidjson::Value json(rapidjson::kObjectType);
     JsonAddMembers(&json, allocator,
                    "message_id", object.message_id,

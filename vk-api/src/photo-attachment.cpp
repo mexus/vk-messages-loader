@@ -6,7 +6,7 @@ namespace util {
 using PhotoAttachment = vk_api::PhotoAttachment;
 
 template<>
-void JsonToObject<PhotoAttachment>(const rapidjson::Value& json, PhotoAttachment* photo) {
+void JsonToObject<>(const rapidjson::Value& json, PhotoAttachment* photo) {
     if (!json.IsObject()) {
         THROW_AT(json::NotAnObjectException);
     }

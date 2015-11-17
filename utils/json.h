@@ -15,9 +15,9 @@ using JsonAllocator = rapidjson::Document::AllocatorType;
 template<class T>
 void JsonToObject(const rapidjson::Value& json, T* object);
 
-template<> void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object);
-template<> void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object);
-template<> void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object);
+template<> void JsonToObject<>(const rapidjson::Value& json, std::string* object);
+template<> void JsonToObject<>(const rapidjson::Value& json, uint64_t* object);
+template<> void JsonToObject<>(const rapidjson::Value& json, time_t* object);
 
 template<class T>
 void JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
@@ -41,9 +41,9 @@ void JsonToObject(const rapidjson::Value& json, std::vector<T>* object) {
 template<class T>
 rapidjson::Value JsonFromObject(const T& object, JsonAllocator& allocator);
 
-template<> rapidjson::Value JsonFromObject<std::string>(const std::string& object, JsonAllocator& allocator);
-template<> rapidjson::Value JsonFromObject<uint64_t>(const uint64_t& object, JsonAllocator& allocator);
-template<> rapidjson::Value JsonFromObject<time_t>(const time_t& object, JsonAllocator& allocator);
+template<> rapidjson::Value JsonFromObject<>(const std::string& object, JsonAllocator& allocator);
+template<> rapidjson::Value JsonFromObject<>(const uint64_t& object, JsonAllocator& allocator);
+template<> rapidjson::Value JsonFromObject<>(const time_t& object, JsonAllocator& allocator);
 
 template<class T>
 rapidjson::Value JsonFromObject(const std::vector<T>& object, JsonAllocator& allocator) {

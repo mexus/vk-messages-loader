@@ -14,7 +14,7 @@ uint64_t GetIdentificator<User>(const User& data) {
 namespace util {
 
 template<>
-void JsonToObject<manager::cache::User>(const rapidjson::Value& json, manager::cache::User* object) {
+void JsonToObject<>(const rapidjson::Value& json, manager::cache::User* object) {
     JsonGetMembers(json,
                    "id", &object->id,
                    "first_name", &object->first_name,
@@ -22,7 +22,7 @@ void JsonToObject<manager::cache::User>(const rapidjson::Value& json, manager::c
 }
 
 template<>
-rapidjson::Value JsonFromObject<manager::cache::User>(const manager::cache::User& object, JsonAllocator& allocator) {
+rapidjson::Value JsonFromObject<>(const manager::cache::User& object, JsonAllocator& allocator) {
     rapidjson::Value json(rapidjson::kObjectType);
     JsonAddMembers(&json, allocator,
                    "id", object.id,

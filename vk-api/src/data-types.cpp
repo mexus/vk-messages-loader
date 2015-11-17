@@ -29,7 +29,7 @@ void JsonToObject<vk_api::List<vk_api::User>>(const rapidjson::Value& json, vk_a
 }
 
 template<>
-void JsonToObject<vk_api::VkError>(const rapidjson::Value& json, vk_api::VkError* error) {
+void JsonToObject<>(const rapidjson::Value& json, vk_api::VkError* error) {
     JsonGetMembers(json,
                    "error_code", &error->error_code,
                    "error_msg", &error->error_msg);

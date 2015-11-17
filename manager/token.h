@@ -33,8 +33,8 @@ private:
     static std::string ExtractValue(const std::string& url, const std::string& parameter);
     static Data ProcessUrl(const std::string& url);
 
-    friend void util::JsonToObject<Data>(const rapidjson::Value& json, Data* object);
-    friend rapidjson::Value util::JsonFromObject<Data>(const Data& object, util::JsonAllocator& allocator);
+    friend void util::JsonToObject<>(const rapidjson::Value& json, Data* object);
+    friend rapidjson::Value util::JsonFromObject<>(const Data& object, util::JsonAllocator& allocator);
 };
 
 }

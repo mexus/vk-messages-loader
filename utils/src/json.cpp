@@ -60,7 +60,7 @@ void JsonGetMembers(const rapidjson::Value& /*json*/) {
 }
 
 template<>
-void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object) {
+void JsonToObject<>(const rapidjson::Value& json, std::string* object) {
     if (!json.IsString()) {
         THROW_AT(json::TypeStringException);
     }
@@ -68,7 +68,7 @@ void JsonToObject<std::string>(const rapidjson::Value& json, std::string* object
 }
 
 template<>
-void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
+void JsonToObject<>(const rapidjson::Value& json, uint64_t* object) {
     if (!json.IsUint64()) {
         THROW_AT(json::TypeUInt64Exception);
     }
@@ -76,7 +76,7 @@ void JsonToObject<uint64_t>(const rapidjson::Value& json, uint64_t* object) {
 }
 
 template<>
-void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object) {
+void JsonToObject<>(const rapidjson::Value& json, time_t* object) {
     if (!json.IsInt64()) {
         THROW_AT(json::TypeInt64Exception);
     }
@@ -84,21 +84,21 @@ void JsonToObject<time_t>(const rapidjson::Value& json, time_t* object) {
 }
 
 template<>
-rapidjson::Value JsonFromObject<std::string>(const std::string& object, JsonAllocator& allocator) {
+rapidjson::Value JsonFromObject<>(const std::string& object, JsonAllocator& allocator) {
     rapidjson::Value json(rapidjson::kStringType);
     json.SetString(object.c_str(), object.size(), allocator);
     return json;
 }
 
 template<>
-rapidjson::Value JsonFromObject<uint64_t>(const uint64_t& object, JsonAllocator& /*allocator*/) {
+rapidjson::Value JsonFromObject<>(const uint64_t& object, JsonAllocator& /*allocator*/) {
     rapidjson::Value json(rapidjson::kNumberType);
     json.SetUint64(object);
     return json;
 }
 
 template<>
-rapidjson::Value JsonFromObject<time_t>(const time_t& object, JsonAllocator& /*allocator*/) {
+rapidjson::Value JsonFromObject<>(const time_t& object, JsonAllocator& /*allocator*/) {
     rapidjson::Value json(rapidjson::kNumberType);
     json.SetInt64(object);
     return json;

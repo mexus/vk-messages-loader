@@ -6,7 +6,7 @@ namespace util {
 using VideoAttachment = vk_api::VideoAttachment;
 
 template<>
-void JsonToObject<VideoAttachment>(const rapidjson::Value& json, VideoAttachment* video) {
+void JsonToObject<>(const rapidjson::Value& json, VideoAttachment* video) {
     if (!json.IsObject()) {
         THROW_AT(json::NotAnObjectException);
     }

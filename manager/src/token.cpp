@@ -8,14 +8,14 @@
 namespace util {
 
 template<>
-void JsonToObject<manager::Token::Data>(const rapidjson::Value& json, manager::Token::Data* object) {
+void JsonToObject<>(const rapidjson::Value& json, manager::Token::Data* object) {
     JsonGetMembers(json,
                    "access_token", &object->access_token,
                    "expire_at", &object->expire_at);
 }
 
 template<>
-rapidjson::Value JsonFromObject<manager::Token::Data>(const manager::Token::Data& object, JsonAllocator& allocator){
+rapidjson::Value JsonFromObject<>(const manager::Token::Data& object, JsonAllocator& allocator){
     rapidjson::Value json(rapidjson::kObjectType);
     JsonAddMembers(&json, allocator,
                    "access_token", object.access_token,

@@ -7,7 +7,7 @@ using Attachments = decltype(vk_api::Message::attachments);
 using Attachment = Attachments::value_type;
 
 template<>
-void JsonToObject<Attachment>(const rapidjson::Value& json, Attachment* attachment) {
+void JsonToObject<>(const rapidjson::Value& json, Attachment* attachment) {
     if (!json.IsObject()) {
         THROW_AT(json::NotAnObjectException);
     }

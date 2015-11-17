@@ -27,8 +27,8 @@ private:
 
     void SaveToFile() const;
 
-    friend void util::JsonToObject<manager::Settings>(const rapidjson::Value& json, manager::Settings* object);
-    friend rapidjson::Value util::JsonFromObject<manager::Settings>(const manager::Settings& object, util::JsonAllocator& allocator);
+    friend void util::JsonToObject<>(const rapidjson::Value& json, manager::Settings* object);
+    friend rapidjson::Value util::JsonFromObject<>(const manager::Settings& object, util::JsonAllocator& allocator);
 };
 
 }
