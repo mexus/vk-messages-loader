@@ -73,7 +73,30 @@ class YcmFlags:
                 new_flags.append(new_flag)
         return new_flags
 
-    def flags_for_file(self, filename):
+    @staticmethod
+    def find_source_for_header(filename):
+        (base_folder, name) = os.path.split(filename)
+        (base_name, ext) = os.path.splitext(name)
+        # 0. Check if the file is a header:
+        if ext not in {".h"}:
+            return (filename, [])
+        source_file_name = base_name + ".cpp"
+        # 1. Look in the same folder
+        probable_source = os.path.join(base_folder, source_file_name)
+        if os.path.exists(probable_source):
+            return (probable_source, ["-x", "c++"])
+        # 2. Look in "src" subfolder
+        sub_folder = os.path.join(base_folder, "src")
+        if os.path.exists(sub_folder) and os.path.isdir(sub_folder):
+            probable_source = os.path.join(sub_folder, source_file_name)
+            if os.path.exists(probable_source):
+                return (probable_source, ["-x", "c++"])
+
+        # ... Give up
+        return (filename, [])
+
+    def flags_for_file(self, original_filename):
+        (filename, extra_flags) = YcmFlags.find_source_for_header(original_filename)
         final_flags = None
         if self.database:
             # Bear in mind that compilation_info.compiler_flags_ does NOT return a
@@ -88,7 +111,7 @@ class YcmFlags:
             relative_to = self.project_path
             final_flags = self.relative_to_absolute(self.flags, relative_to)
         return {
-            'flags': final_flags,
+            'flags': final_flags + extra_flags,
             'do_cache': True
         }
 
