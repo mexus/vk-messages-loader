@@ -13,7 +13,7 @@ namespace manager {
 
 class Manager {
 public:
-    Manager(Settings* settings, vk_api::Callbacks* callbacks);
+    Manager(const std::shared_ptr<Settings>& settings, vk_api::Callbacks* callbacks);
     ~Manager();
 
     void UpdateFriends();
@@ -26,7 +26,7 @@ public:
     const cache::Users& GetUsersCache() const;
 
 private:
-    Settings* settings_;
+    const std::shared_ptr<Settings> settings_;
     vk_api::CommunicationInterface vk_interface_;
     storage::HistoryDB history_db_;
     cache::Users users_cache_;

@@ -7,12 +7,12 @@ namespace cli {
 
 class CommandLineInterface {
 public:
-    CommandLineInterface(manager::Settings* settings);
+    CommandLineInterface(const std::shared_ptr<manager::Settings>& settings);
 
     void Execute();
 
 private:
-    manager::Settings* settings_;
+    const std::shared_ptr<manager::Settings> settings_;
     Callbacks callbacks_;
     manager::Manager manager_;
 

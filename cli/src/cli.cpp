@@ -3,7 +3,7 @@
 
 namespace cli {
 
-CommandLineInterface::CommandLineInterface(manager::Settings* settings)
+CommandLineInterface::CommandLineInterface(const std::shared_ptr<manager::Settings>& settings)
         : settings_(settings),
           callbacks_(settings_->GetApplicationId(), settings_->GetStoragePath() + "/token.data"),
           manager_(settings_, &callbacks_) {

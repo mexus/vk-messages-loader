@@ -7,7 +7,7 @@
 
 namespace manager {
 
-Manager::Manager(Settings* settings, vk_api::Callbacks* callbacks)
+Manager::Manager(const std::shared_ptr<Settings>& settings, vk_api::Callbacks* callbacks)
         : settings_(settings),
           vk_interface_(callbacks),
           history_db_(settings_->GetStoragePath() + "/messages"),

@@ -1,5 +1,5 @@
-/config.data
-
+# Data folder
+/data
 # Temp files
 *.pyc
 *.swp
