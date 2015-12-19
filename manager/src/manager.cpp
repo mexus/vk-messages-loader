@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <vk-api/users.h>
-#include <vk-api/friends.h>
 #include <utils/exceptions.h>
 
 namespace manager {
@@ -12,7 +11,7 @@ Manager::Manager(const std::shared_ptr<Settings>& settings, vk_api::Callbacks* c
           vk_interface_(callbacks),
           history_db_(settings_->GetStoragePath() + "/messages"),
           users_cache_(settings_->GetStoragePath() + "/users.cache"),
-          friends_cache_(settings_->GetStoragePath() + "/friends.cache"),
+          dialogues_users_cache_(settings_->GetStoragePath() + "/dialogues-users.cache"),
           history_export_(users_cache_) {
     try {
         users_cache_.Load();
@@ -20,9 +19,9 @@ Manager::Manager(const std::shared_ptr<Settings>& settings, vk_api::Callbacks* c
         LOG(WARNING) << "Can't load users cache from file " << e.GetFileName();
     }
     try {
-        friends_cache_.Load();
+        dialogues_users_cache_.Load();
     } catch (const util::FileReadException& e) {
-        LOG(WARNING) << "Can't load friends cache from file " << e.GetFileName();
+        LOG(WARNING) << "Can't load dialogues users cache from file " << e.GetFileName();
     }
     vk_api::UsersAPI users_api(&vk_interface_);
     auto user = users_api.GetUser();
@@ -61,22 +60,25 @@ void Manager::UpdateMessages() {
     return ;
 }
 
-void Manager::UpdateFriends() {
-    vk_api::FriendsAPI friends_api(&vk_interface_);
-    auto friends = friends_api.GetFriends();
-    if (friends.empty()) {
-        return ;
+void Manager::UpdateDialoguesList() {
+    vk_api::MessageAPI messages_api(&vk_interface_);
+    vk_api::UsersAPI users_api(&vk_interface_);
+    auto last_messages = messages_api.GetLastMessages();
+    std::vector<uint64_t> user_ids;
+    for (auto& msg: last_messages) {
+        user_ids.push_back(msg.user_id);
     }
-    for (auto& user: friends) {
-        users_cache_.AddData(cache::User{user.user_id, user.first_name, user.last_name});
-        friends_cache_.AddData(std::move(user));
+    auto users = users_api.GetUsers(user_ids);
+    for (auto& user: users) {
+        users_cache_.AddData(user);
+        dialogues_users_cache_.AddData(user);
     }
     users_cache_.Save();
-    friends_cache_.Save();
+    dialogues_users_cache_.Save();
 }
 
-std::vector<vk_api::User> Manager::GetFriends() const {
-    return friends_cache_.GetDataAsVector();
+std::vector<vk_api::User> Manager::GetDialoguesUsers() const {
+    return dialogues_users_cache_.GetDataAsVector();
 }
 
 std::vector<uint64_t> Manager::GetActiveUsers() const {

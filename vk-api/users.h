@@ -12,11 +12,14 @@ public:
 class UsersAPI {
 public:
     UsersAPI(CommunicationInterface* vk_interface);
-    User GetUser();
+    User GetUser() const;
+    User GetUser(uint64_t user_id) const;
+    std::vector<User> GetUsers(const std::vector<uint64_t>& ids) const;
 
 private:
-    CommunicationInterface * const vk_interface_;
     static const std::string kInterfaceName;
+    static const uint64_t kUserSelf;
+    CommunicationInterface * const vk_interface_;
 };
 
 }

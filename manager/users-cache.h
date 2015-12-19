@@ -1,18 +1,15 @@
 #pragma once
 
+#include <vk-api/friends.h>
 #include "cache.h"
 
 namespace manager {
 namespace cache {
 
-struct User {
-    uint64_t id;
-    std::string first_name;
-    std::string last_name;
-};
+typedef MappedCache<vk_api::User> Users;
 
-typedef MappedCache<User> Users;
-template<> uint64_t GetIdentificator<User>(const User& data);
+template<>
+uint64_t GetIdentificator(const vk_api::User& data);
 
 }
 }

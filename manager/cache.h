@@ -34,6 +34,11 @@ public:
         data_[id] = std::move(data);
     }
 
+    void AddData(const T& data) {
+        uint64_t id = cache::GetIdentificator(data);
+        data_[id] = data;
+    }
+
     T GetData(uint64_t id) const {
         auto it = data_.find(id);
         if (it == data_.end()) {

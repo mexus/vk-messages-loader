@@ -2,8 +2,8 @@
 #include <vk-api/data-types.h>
 
 namespace vk_api {
-struct WrappedMessage {
-    Message message;
+struct WrappedMessageInfo {
+    MessageInfo info;
 };
 }
 
@@ -67,6 +67,7 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
                    "id", &object->id,
                    "date", &object->date,
                    "from_id", &object->from_id,
+                   "chat_id", &object->chat_id, json::Optional{},
                    "user_id", &object->user_id,
                    "body", &object->body);
     auto it = json.FindMember("attachments");
@@ -77,9 +78,17 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
 }
 
 template<>
-void JsonToObject<>(const rapidjson::Value& json, vk_api::WrappedMessage* object) {
+void JsonToObject<>(const rapidjson::Value& json, vk_api::MessageInfo* object) {
     JsonGetMembers(json,
-                   "message", &object->message);
+                   "id", &object->id,
+                   "chat_id", &object->chat_id, json::Optional{},
+                   "user_id", &object->user_id);
+}
+
+template<>
+void JsonToObject<>(const rapidjson::Value& json, vk_api::WrappedMessageInfo* object) {
+    JsonGetMembers(json,
+                   "message", &object->info);
 }
 
 // These functions are needed to avoid linker errors
@@ -91,10 +100,11 @@ void JsonToObject<vk_api::List<vk_api::Message>>(const rapidjson::Value& json, v
 }
 
 template<>
-void JsonToObject<vk_api::List<vk_api::WrappedMessage>>(const rapidjson::Value& json, vk_api::List<vk_api::WrappedMessage>* object) {
+void JsonToObject<vk_api::List<vk_api::WrappedMessageInfo>>(const rapidjson::Value& json,
+                                                            vk_api::List<vk_api::WrappedMessageInfo>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
-    JsonToObject<vk_api::WrappedMessage>(json, object);
+    JsonToObject<vk_api::WrappedMessageInfo>(json, object);
 }
 
 }
@@ -163,9 +173,9 @@ std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_me
     return total_messages;
 }
 
-std::vector<Message> MessageAPI::GetLastMessages() const {
+std::vector<MessageInfo> MessageAPI::GetLastMessages() const {
     static const size_t max_data_per_request = 200;
-    std::vector<Message> all_messages;
+    std::vector<MessageInfo> all_messages;
     size_t last_message_id = 0;
     while (true) {
         cpr::Parameters params;
@@ -185,7 +195,7 @@ std::vector<Message> MessageAPI::GetLastMessages() const {
             LOG(ERROR) << "Caught an exception during a request: " << e.what();
             break ;
         }
-        List<WrappedMessage> response;
+        List<WrappedMessageInfo> response;
         try {
             util::JsonGetMember(doc, "response", &response);
         } catch (const util::json::Exception& e) {
@@ -195,9 +205,9 @@ std::vector<Message> MessageAPI::GetLastMessages() const {
         if (response.items.empty()) {
             break ;
         }
-        last_message_id = response.items[0].message.id;
+        last_message_id = response.items.back().info.id;
         for (auto& msg: response.items) {
-            all_messages.push_back(std::move(msg.message));
+            all_messages.push_back(std::move(msg.info));
         }
     }
     return all_messages;

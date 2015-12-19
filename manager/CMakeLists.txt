@@ -1,6 +1,5 @@
 add_library("manager"
             "src/exceptions.cpp"
-            "src/friends-cache.cpp"
             "src/history-export.cpp"
             "src/manager.cpp"
             "src/settings.cpp"

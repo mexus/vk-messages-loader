@@ -19,6 +19,7 @@ struct Message {
     uint64_t id;
     time_t date;
     uint64_t from_id;
+    uint64_t chat_id;
     uint64_t user_id;
     std::string body;
     std::vector<std::unique_ptr<Attachment>> attachments;

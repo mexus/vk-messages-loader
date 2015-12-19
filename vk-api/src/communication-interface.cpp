@@ -51,7 +51,7 @@ RequestsManager::Response CommunicationInterface::SendRequest(const std::string&
 std::string CommunicationInterface::GetUrl(const std::string& method_name, cpr::Parameters* params) {
     static const std::string
         address("https://api.vk.com/method/"),
-        version("5.37");
+        version("5.40");
     std::string access_token = callbacks_->GetToken();
     cpr::Url url = address + method_name;
     params->AddParameter({"access_token", access_token});

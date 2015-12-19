@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <ctime>
 #include <iostream>
-#include <manager/friends-cache.h>
 #include <manager/history-export.h>
 #include <manager/settings.h>
 #include <manager/users-cache.h>
@@ -16,10 +15,10 @@ public:
     Manager(const std::shared_ptr<Settings>& settings, vk_api::Callbacks* callbacks);
     ~Manager();
 
-    void UpdateFriends();
+    void UpdateDialoguesList();
     void UpdateMessages();
 
-    std::vector<vk_api::User> GetFriends() const;
+    std::vector<vk_api::User> GetDialoguesUsers() const;
     std::vector<uint64_t> GetActiveUsers() const;
     void AddActiveUser(uint64_t id);
     void ExportHistory();
@@ -29,8 +28,8 @@ private:
     const std::shared_ptr<Settings> settings_;
     vk_api::CommunicationInterface vk_interface_;
     storage::HistoryDB history_db_;
-    cache::Users users_cache_;
-    cache::FriendsCache friends_cache_;
+    cache::Users users_cache_,
+                 dialogues_users_cache_;
     uint64_t current_user_id_;
     HistoryExport history_export_;
 

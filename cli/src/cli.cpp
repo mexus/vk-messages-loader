@@ -24,9 +24,9 @@ bool CommandLineInterface::InputYesOrNo(const std::string& question) {
     }
 }
 
-void CommandLineInterface::PrintFriends(const std::vector<vk_api::User>& friends) {
+void CommandLineInterface::PrintUsers(const std::vector<vk_api::User>& users) {
     size_t i = 0;
-    for (auto& user: friends) {
+    for (auto& user: users) {
         std::cout << ++i << ". " << user.user_id << " user: " << user.first_name << " " << user.last_name << "\n";
     }
 }
@@ -58,17 +58,17 @@ void CommandLineInterface::AddActiveUser(const std::vector<vk_api::User>& friend
 }
 
 void CommandLineInterface::Execute() {
-    if (InputYesOrNo("Update friends list?")) {
-        manager_.UpdateFriends();
+    if (InputYesOrNo("Update dialogues list?")) {
+        manager_.UpdateDialoguesList();
     }
     auto active_friends = manager_.GetActiveUsers();
-    auto friends = manager_.GetFriends();
+    auto dialogues_users = manager_.GetDialoguesUsers();
     std::cout << "Friends to fetch message history:\n";
     PrintActiveUsers();
-    if (InputYesOrNo("Print friends list?")) {
-        PrintFriends(friends);
-        while (InputYesOrNo("Add a friend to fetch message history?")) {
-            AddActiveUser(friends);
+    if (InputYesOrNo("Print dialogues list?")) {
+        PrintUsers(dialogues_users);
+        while (InputYesOrNo("Add a user to fetch message history?")) {
+            AddActiveUser(dialogues_users);
         }
         PrintActiveUsers();
     }

@@ -20,7 +20,7 @@ private:
     void AddActiveUser(const std::vector<vk_api::User>& friends);
 
     static bool InputYesOrNo(const std::string& question);
-    static void PrintFriends(const std::vector<vk_api::User>& friends);
+    static void PrintUsers(const std::vector<vk_api::User>& users);
 };
 
 }
