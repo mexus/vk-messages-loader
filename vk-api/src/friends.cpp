@@ -26,7 +26,7 @@ std::vector<User> FriendsAPI::GetFriends() {
         List<User> response;
         try {
             util::JsonGetMember(doc, "response", &response);
-        } catch (util::json::Exception& e) {
+        } catch (const util::json::Exception& e) {
             LOG(ERROR) << "Unable to convert response to a list of friends: " << e.what();
             break ;
         }

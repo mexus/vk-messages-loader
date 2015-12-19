@@ -24,7 +24,6 @@ struct Message {
     std::vector<std::unique_ptr<Attachment>> attachments;
 };
 
-
 template<class T>
 struct List {
     uint64_t count;

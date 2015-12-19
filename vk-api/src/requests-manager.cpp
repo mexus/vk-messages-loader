@@ -26,6 +26,7 @@ cpr::Response RequestsManager::GetHttpResponse(const cpr::Url& url, const cpr::P
         LOG(DEBUG) << http_response.url;
         long status_code = http_response.status_code;
         if (status_code == 0) {
+            LOG(DEBUG) << "Got status code zero";
             if (attempt == max_attempts) {
                 LOG(DEBUG) << "Attempts exceeded (" << attempt << "/" << max_attempts << ")";
                 THROW_AT(RequestException, http_response);

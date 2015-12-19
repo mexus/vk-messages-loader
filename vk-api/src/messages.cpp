@@ -1,6 +1,12 @@
 #include <vk-api/messages.h>
 #include <vk-api/data-types.h>
 
+namespace vk_api {
+struct WrappedMessage {
+    Message message;
+};
+}
+
 namespace util {
 
 using Attachments = decltype(vk_api::Message::attachments);
@@ -47,7 +53,7 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
             if (attachment) {
                 attachments->push_back(std::move(attachment));
             }
-        } catch (json::Exception& e) {
+        } catch (const json::Exception& e) {
             LOG(ERROR) << "Json exception at `" << e.GetAt()
                        << "` while extracting an attachment: "
                        << e.GetMessage();
@@ -70,12 +76,25 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
     }
 }
 
-// This function is needed to avoid a linker error
+template<>
+void JsonToObject<>(const rapidjson::Value& json, vk_api::WrappedMessage* object) {
+    JsonGetMembers(json,
+                   "message", &object->message);
+}
+
+// These functions are needed to avoid linker errors
 template<>
 void JsonToObject<vk_api::List<vk_api::Message>>(const rapidjson::Value& json, vk_api::List<vk_api::Message>* object) {
     // This call will be resolved to a template function for vk_api::List<T>,
     // so no loops will be created
     JsonToObject<vk_api::Message>(json, object);
+}
+
+template<>
+void JsonToObject<vk_api::List<vk_api::WrappedMessage>>(const rapidjson::Value& json, vk_api::List<vk_api::WrappedMessage>* object) {
+    // This call will be resolved to a template function for vk_api::List<T>,
+    // so no loops will be created
+    JsonToObject<vk_api::WrappedMessage>(json, object);
 }
 
 }
@@ -87,15 +106,12 @@ const std::string MessageAPI::kInterfaceName = "messages";
 MessageAPI::MessageAPI(CommunicationInterface* interface) : vk_interface_(interface) {
 }
 
-std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_message_id, uint64_t total_count) {
+std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_message_id, uint64_t total_count) const {
     static const unsigned max_messages_per_request = 200;
     std::vector<Message> total_messages;
-    cpr::Parameters const_params {
-            {"user_id", std::to_string(user_id)}
-        };
     uint64_t last_message_id = start_message_id;
     while (true) {
-        auto params = const_params;
+        cpr::Parameters params {{"user_id", std::to_string(user_id)}};
         unsigned count = max_messages_per_request;
         if (total_count != 0) {
             count = std::min<uint64_t>(total_count - total_messages.size(), max_messages_per_request);
@@ -122,7 +138,7 @@ std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_me
         List<Message> response;
         try {
             util::JsonGetMember(doc, "response", &response);
-        } catch (util::json::Exception& e) {
+        } catch (const util::json::Exception& e) {
             LOG(ERROR) << "Unable to convert a response to a list of messages: " << e.what();
             break ;
         }
@@ -145,6 +161,46 @@ std::vector<Message> MessageAPI::GetMessages(uint64_t user_id, uint64_t start_me
         last_message_id = total_messages.back().id;
     }
     return total_messages;
+}
+
+std::vector<Message> MessageAPI::GetLastMessages() const {
+    static const size_t max_data_per_request = 200;
+    std::vector<Message> all_messages;
+    size_t last_message_id = 0;
+    while (true) {
+        cpr::Parameters params;
+        params.AddParameter({"count", std::to_string(max_data_per_request)});
+        params.AddParameter({"preview_length", "1"});
+        if (last_message_id != 0) {
+            params.AddParameter({"start_message_id", std::to_string(last_message_id)});
+            params.AddParameter({"offset", "1"});
+        } else {
+            params.AddParameter({"offset", "0"});
+        }
+        rapidjson::Document doc;
+        try {
+            auto reply = vk_interface_->SendRequest(kInterfaceName, "getDialogs", params);
+            doc = std::move(reply);
+        } catch (const util::BasicException& e) {
+            LOG(ERROR) << "Caught an exception during a request: " << e.what();
+            break ;
+        }
+        List<WrappedMessage> response;
+        try {
+            util::JsonGetMember(doc, "response", &response);
+        } catch (const util::json::Exception& e) {
+            LOG(ERROR) << "Unable to convert a response to a list of wrapped messages: " << e.what();
+            break ;
+        }
+        if (response.items.empty()) {
+            break ;
+        }
+        last_message_id = response.items[0].message.id;
+        for (auto& msg: response.items) {
+            all_messages.push_back(std::move(msg.message));
+        }
+    }
+    return all_messages;
 }
 
 }
