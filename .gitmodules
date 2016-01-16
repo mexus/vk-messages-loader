@@ -7,3 +7,6 @@
 [submodule "3rd-party/easyloggingpp"]
 	path = 3rd-party/easyloggingpp
 	url = https://github.com/easylogging/easyloggingpp
+[submodule "ycm"]
+	path = ycm
+	url = https://github.com/mexus/ycm-flags
