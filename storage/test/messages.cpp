@@ -17,7 +17,6 @@ BOOST_AUTO_TEST_CASE(message_converters) {
   Message etalon_message{std::numeric_limits<uint64_t>::max(),
                          4602523593,
                          users_distr(generator),
-                         users_distr(generator),
                          "test body",
                          {{PHOTO, "PICTURE"}, {VIDEO, "ahaha"}}};
 

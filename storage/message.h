@@ -16,7 +16,6 @@ struct Message {
   uint64_t message_id;
   time_t date;
   uint64_t from_user_id;
-  uint64_t to_user_id;
   std::string body;
   std::vector<Attachment> attachments;
 };

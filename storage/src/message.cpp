@@ -23,9 +23,8 @@ rapidjson::Value JsonFromObject<>(const storage::Attachment& object,
 template <>
 void JsonToObject<>(const rapidjson::Value& json, storage::Message* object) {
   JsonGetMembers(json, "message_id", &object->message_id, "date", &object->date,
-                 "from_user_id", &object->from_user_id, "to_user_id",
-                 &object->to_user_id, util::json::Optional{}, "body",
-                 &object->body, "attachments", &object->attachments);
+                 "from_user_id", &object->from_user_id, util::json::Optional{},
+                 "body", &object->body, "attachments", &object->attachments);
 }
 
 template <>
@@ -33,9 +32,8 @@ rapidjson::Value JsonFromObject<>(const storage::Message& object,
                                   JsonAllocator& allocator) {
   rapidjson::Value json(rapidjson::kObjectType);
   JsonAddMembers(&json, allocator, "message_id", object.message_id, "date",
-                 object.date, "from_user_id", object.from_user_id, "to_user_id",
-                 object.to_user_id, "body", object.body, "attachments",
-                 object.attachments);
+                 object.date, "from_user_id", object.from_user_id, "body",
+                 object.body, "attachments", object.attachments);
   return json;
 }
 }

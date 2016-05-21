@@ -45,14 +45,11 @@ void Manager::UpdateMessages() {
       continue;
     }
     for (auto& vk_message : messages) {
-      storage::Message storage_message{
-          vk_message.id,
-          vk_message.date,
-          vk_message.from_id,
-          (vk_message.user_id == vk_message.from_id) ? current_user_id_
-                                                     : vk_message.user_id,
-          std::move(vk_message.body),
-          {}};
+      storage::Message storage_message{vk_message.id,
+                                       vk_message.date,
+                                       vk_message.from_id,
+                                       std::move(vk_message.body),
+                                       {}};
       for (auto& attachment : vk_message.attachments) {
         AddAttachment(attachment, &storage_message);
       }
