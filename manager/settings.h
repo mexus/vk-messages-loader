@@ -17,6 +17,9 @@ class Settings {
   const std::vector<uint64_t>& GetUsers() const;
   std::vector<uint64_t>& GetUsers();
 
+  const std::vector<uint64_t>& GetChats() const;
+  std::vector<uint64_t>& GetChats();
+
  private:
   const std::string file_name_;
   const std::string json_field_;
@@ -24,6 +27,7 @@ class Settings {
   std::string application_id_;
   std::string storage_path_;
   std::vector<uint64_t> users_;
+  std::vector<uint64_t> chats_;
 
   void SaveToFile() const;
 

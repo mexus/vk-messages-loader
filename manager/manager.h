@@ -20,8 +20,13 @@ class Manager {
   void UpdateMessages();
 
   std::vector<vk_api::User> GetDialoguesUsers() const;
+
   std::vector<uint64_t> GetActiveUsers() const;
   void AddActiveUser(uint64_t id);
+
+  std::vector<uint64_t> GetActiveChats() const;
+  void AddActiveChat(uint64_t id);
+
   void ExportHistory();
   const cache::Users& GetUsersCache() const;
 
@@ -32,6 +37,11 @@ class Manager {
   cache::Users users_cache_, dialogues_users_cache_;
   uint64_t current_user_id_;
   HistoryExport history_export_;
+
+  void ExportHistory(
+      const std::string& path,
+      std::function<std::shared_ptr<storage::History>(uint64_t)> f,
+      const std::vector<uint64_t>& ids, const std::string& prefix) const;
 
   static void AddAttachment(
       const std::unique_ptr<vk_api::Attachment>& attachment,

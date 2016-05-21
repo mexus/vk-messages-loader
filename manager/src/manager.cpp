@@ -94,6 +94,31 @@ void Manager::AddActiveUser(uint64_t user_id) {
   }
 }
 
+std::vector<uint64_t> Manager::GetActiveChats() const {
+  return settings_->GetChats();
+}
+
+void Manager::AddActiveChat(uint64_t chat_id) {
+  auto& chats = settings_->GetChats();
+  auto it =
+      std::find_if(chats.begin(), chats.end(),
+                   [chat_id](const uint64_t& chat) { return chat_id == chat; });
+  if (it == chats.end()) {
+    chats.push_back(chat_id);
+  }
+}
+
+void Manager::ExportHistory(
+    const std::string& path,
+    std::function<std::shared_ptr<storage::History>(uint64_t)> f,
+    const std::vector<uint64_t>& ids, const std::string& prefix) const {
+  for (auto& id : ids) {
+    std::string path_for_id = path + "/" + prefix + std::to_string(id);
+    auto history = f(id);
+    history_export_.ExportToFile(history, path_for_id);
+  }
+}
+
 void Manager::ExportHistory() {
   auto path =
       boost::filesystem::path(settings_->GetStoragePath()) / "exported/";
@@ -101,11 +126,14 @@ void Manager::ExportHistory() {
     boost::filesystem::create_directory(path);
   }
   auto users = settings_->GetUsers();
-  for (auto& user_id : users) {
-    std::string user_path = (path / std::to_string(user_id)).string();
-    auto user_history = history_db_.GetUser(user_id);
-    history_export_.ExportToFile(user_history, user_path);
-  }
+  auto str_path = path.string();
+  ExportHistory(str_path, std::bind(&storage::HistoryDB::GetUser, &history_db_,
+                                    std::placeholders::_1),
+                users, "user-");
+  auto chats = settings_->GetChats();
+  ExportHistory(str_path, std::bind(&storage::HistoryDB::GetChat, &history_db_,
+                                    std::placeholders::_1),
+                chats, "chat-");
 }
 
 const cache::Users& Manager::GetUsersCache() const { return users_cache_; }

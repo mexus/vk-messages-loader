@@ -46,6 +46,9 @@ const std::vector<uint64_t>& Settings::GetUsers() const { return users_; }
 
 std::vector<uint64_t>& Settings::GetUsers() { return users_; }
 
+std::vector<uint64_t>& Settings::GetChats() { return chats_; }
+const std::vector<uint64_t>& Settings::GetChats() const { return chats_; }
+
 void Settings::SaveToFile() const {
   rapidjson::Document doc;
   doc.SetObject();

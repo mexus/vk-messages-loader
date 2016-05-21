@@ -21,10 +21,23 @@ std::shared_ptr<History> HistoryDB::GetUser(uint64_t user_id) {
   return storage;
 }
 
-std::shared_ptr<History> HistoryDB::GetStorage(uint64_t user_id) {
+std::shared_ptr<History> HistoryDB::GetChat(uint64_t chat_id) {
+  auto it = chats_history_.find(chat_id);
+  if (it != chats_history_.end()) {
+    auto pointer = it->second.lock();
+    if (pointer) {
+      return pointer;
+    }
+  }
+  auto storage = GetStorage(chat_id, "chat-");
+  chats_history_[chat_id] = storage;
+  return storage;
+}
+
+std::shared_ptr<History> HistoryDB::GetStorage(uint64_t user_id, const std::string& prefix) {
   CheckPath();
   boost::filesystem::path path(path_);
-  path /= std::to_string(user_id);
+  path /= prefix + std::to_string(user_id);
   return std::make_shared<History>(path.string<std::string>());
 }
 
