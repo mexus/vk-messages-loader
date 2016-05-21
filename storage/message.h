@@ -1,28 +1,23 @@
 #pragma once
 #include <cstdint>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace storage {
 
-enum AttachmentType : uint64_t {
-    PHOTO,
-    VIDEO,
-    STICKER
-};
+enum AttachmentType : uint64_t { PHOTO, VIDEO, STICKER };
 
 struct Attachment {
-    AttachmentType type;
-    std::string body;
+  AttachmentType type;
+  std::string body;
 };
 
 struct Message {
-    uint64_t message_id;
-    time_t date;
-    uint64_t from_user_id;
-    uint64_t to_user_id;
-    std::string body;
-    std::vector<Attachment> attachments;
+  uint64_t message_id;
+  time_t date;
+  uint64_t from_user_id;
+  uint64_t to_user_id;
+  std::string body;
+  std::vector<Attachment> attachments;
 };
-
 }

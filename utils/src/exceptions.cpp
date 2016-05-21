@@ -2,51 +2,45 @@
 
 namespace util {
 
-BasicException::BasicException(const std::string& at, const std::string& message)
-        : std::runtime_error("At " + at + ": " + message),
-          at_(at),
-          message_(message) {
-}
+BasicException::BasicException(const std::string& at,
+                               const std::string& message)
+    : std::runtime_error("At " + at + ": " + message),
+      at_(at),
+      message_(message) {}
 
-std::string BasicException::GetAt() const {
-    return at_;
-}
+std::string BasicException::GetAt() const { return at_; }
 
-std::string BasicException::GetMessage() const {
-    return message_;
-}
+std::string BasicException::GetMessage() const { return message_; }
 
-FileException::FileException(const std::string& at, Operation operation, const std::string& file_name)
-        : BasicException(at, "Operation '" + OperationToString(operation) + "' has failed on a file '" + file_name + "'"),
-          operation_(operation),
-          file_name_(file_name) {
-}
+FileException::FileException(const std::string& at, Operation operation,
+                             const std::string& file_name)
+    : BasicException(at, "Operation '" + OperationToString(operation) +
+                             "' has failed on a file '" + file_name + "'"),
+      operation_(operation),
+      file_name_(file_name) {}
 
 FileException::Operation FileException::GetOperation() const {
-    return operation_;
+  return operation_;
 }
 
 std::string FileException::OperationToString(Operation operation) {
-    switch(operation) {
-        case READ:
-            return "read";
-        case WRITE:
-            return "write";
-        default:
-            return "unknown";
-    }
+  switch (operation) {
+    case READ:
+      return "read";
+    case WRITE:
+      return "write";
+    default:
+      return "unknown";
+  }
 }
 
-std::string FileException::GetFileName() const {
-    return file_name_;
-}
+std::string FileException::GetFileName() const { return file_name_; }
 
-FileReadException::FileReadException(const std::string& at, const std::string& file_name)
-        : FileException(at, FileException::READ, file_name) {
-}
+FileReadException::FileReadException(const std::string& at,
+                                     const std::string& file_name)
+    : FileException(at, FileException::READ, file_name) {}
 
-FileWriteException::FileWriteException(const std::string& at, const std::string& file_name)
-        : FileException(at, FileException::WRITE, file_name) {
-}
-
+FileWriteException::FileWriteException(const std::string& at,
+                                       const std::string& file_name)
+    : FileException(at, FileException::WRITE, file_name) {}
 }

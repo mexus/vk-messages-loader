@@ -8,8 +8,7 @@ namespace cache {
 
 typedef MappedCache<vk_api::User> Users;
 
-template<>
+template <>
 uint64_t GetIdentificator(const vk_api::User& data);
-
 }
 }
