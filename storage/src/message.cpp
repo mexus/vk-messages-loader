@@ -7,7 +7,7 @@ namespace util {
 template <>
 void JsonToObject<>(const rapidjson::Value& json, storage::Attachment* object) {
   uint64_t type;
-  JsonGetMembers(json, "type", &type, "body", &object->body);
+  JsonGetMembers(json)("type", &type)("body", &object->body);
   object->type = static_cast<storage::AttachmentType>(type);
 }
 
@@ -22,9 +22,10 @@ rapidjson::Value JsonFromObject<>(const storage::Attachment& object,
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, storage::Message* object) {
-  JsonGetMembers(json, "message_id", &object->message_id, "date", &object->date,
-                 "from_user_id", &object->from_user_id, util::json::Optional{},
-                 "body", &object->body, "attachments", &object->attachments);
+  JsonGetMembers(json)("message_id", &object->message_id)(
+      "date", &object->date)("from_user_id", &object->from_user_id,
+                             util::json::Optional{})("body", &object->body)(
+      "attachments", &object->attachments);
 }
 
 template <>

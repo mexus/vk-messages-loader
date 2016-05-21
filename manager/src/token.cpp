@@ -10,8 +10,8 @@ namespace util {
 template <>
 void JsonToObject<>(const rapidjson::Value& json,
                     manager::Token::Data* object) {
-  JsonGetMembers(json, "access_token", &object->access_token, "expire_at",
-                 &object->expire_at);
+  JsonGetMembers(json)("access_token", &object->access_token)(
+      "expire_at", &object->expire_at);
 }
 
 template <>

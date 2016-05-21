@@ -48,6 +48,6 @@ namespace util {
 
 template <class T>
 void JsonToObject(const rapidjson::Value& json, vk_api::List<T>* list) {
-  JsonGetMembers(json, "count", &list->count, "items", &list->items);
+  JsonGetMembers(json)("count", &list->count)("items", &list->items);
 }
 }

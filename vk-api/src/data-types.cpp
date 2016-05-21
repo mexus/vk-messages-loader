@@ -4,8 +4,8 @@ namespace util {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::User* object) {
-  JsonGetMembers(json, "id", &object->user_id, "first_name",
-                 &object->first_name, "last_name", &object->last_name);
+  JsonGetMembers(json)("id", &object->user_id)(
+      "first_name", &object->first_name)("last_name", &object->last_name);
 }
 
 template <>
@@ -28,12 +28,12 @@ void JsonToObject<vk_api::List<vk_api::User>>(
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::VkError* error) {
-  JsonGetMembers(json, "error_code", &error->error_code, "error_msg",
-                 &error->error_msg);
+  JsonGetMembers(json)("error_code", &error->error_code)("error_msg",
+                                                         &error->error_msg);
   if (error->error_code == vk_api::VK_ERRORS::CAPTURE_REQUIRED) {
     if (json.HasMember("captcha_sid") && json.HasMember("captcha_img")) {
       std::string sid, img;
-      JsonGetMembers(json, "captcha_sid", &sid, "captcha_img", &img);
+      JsonGetMembers(json)("captcha_sid", &sid)("captcha_img", &img);
       error->additional_data = {{"captcha_sid", sid}, {"captcha_img", img}};
     }
   }

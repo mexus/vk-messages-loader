@@ -97,37 +97,34 @@ void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator,
   JsonAddMembers(json, allocator, std::forward<Args>(args)...);
 }
 
-template <class T, class... Args>
-void JsonGetMembers(const rapidjson::Value& json, const std::string& name,
-                    T* value, json::Optional optional, Args&&... args);
-template <class T, class... Args>
-void JsonGetMembers(const rapidjson::Value& json, const std::string& name,
-                    T* value, Args&&... args);
-void JsonGetMembers(const rapidjson::Value& json);
+class JsonMembersGetter {
+ public:
+  JsonMembersGetter(const rapidjson::Value& json);
 
-template <class T, class... Args>
-void JsonGetMembers(const rapidjson::Value& json, const std::string& name,
-                    T* value, json::Optional /*optional*/, Args&&... args) {
-  if (!json.IsObject()) {
-    THROW_AT(json::NotAnObjectException);
-  }
-  JsonGetMembers(json, std::forward<Args>(args)...);
-  try {
-    JsonGetMember(json, name, value);
-  } catch (const json::Exception&) {
-    // Just skip it, it's optional after all
-  }
-}
+  const JsonMembersGetter& operator()() const;
 
-template <class T, class... Args>
-void JsonGetMembers(const rapidjson::Value& json, const std::string& name,
-                    T* value, Args&&... args) {
-  if (!json.IsObject()) {
-    THROW_AT(json::NotAnObjectException);
+  template <class T>
+  const JsonMembersGetter& operator()(const std::string& name, T* value,
+                                   json::Optional /*optional*/) const {
+    try {
+      JsonGetMember(json_, name, value);
+    } catch (const json::Exception&) {
+      // Just skip it, it's optional after all
+    }
+    return *this;
   }
-  JsonGetMembers(json, std::forward<Args>(args)...);
-  JsonGetMember(json, name, value);
-}
+
+  template <class T>
+  const JsonMembersGetter& operator()(const std::string& name, T* value) const {
+    JsonGetMember(json_, name, value);
+    return *this;
+  }
+
+ private:
+  const rapidjson::Value& json_;
+};
+
+JsonMembersGetter JsonGetMembers(const rapidjson::Value& json);
 
 rapidjson::Document JsonFromFile(const std::string& file_name);
 void JsonToFile(const std::string& file_name,
