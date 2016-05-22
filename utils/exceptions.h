@@ -1,7 +1,8 @@
 #pragma once
 #include <stdexcept>
 
-#define THROW_AT(E, ...) throw E(__PRETTY_FUNCTION__, ##__VA_ARGS__)
+// #define __PRETTY_FUNCTION__ __FILE__ "::" __LINE__
+#define THROW_AT(E, ...) throw E("::", ##__VA_ARGS__)
 
 namespace util {
 
@@ -9,7 +10,7 @@ class BasicException : public std::runtime_error {
  public:
   BasicException(const std::string& at, const std::string& message);
   std::string GetAt() const;
-  std::string GetMessage() const;
+  std::string GetText() const;
 
  private:
   const std::string at_;

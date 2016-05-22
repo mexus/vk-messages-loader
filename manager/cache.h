@@ -26,7 +26,7 @@ class MappedCache {
       Save();
     } catch (const util::BasicException& e) {
       LOG(ERROR) << "Caught an exception at `" << e.GetAt() << "` "
-                 << "while saving a data: " << e.GetMessage();
+                 << "while saving a data: " << e.GetText();
     }
   }
 

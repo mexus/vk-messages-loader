@@ -55,7 +55,7 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
       }
     } catch (const json::Exception& e) {
       LOG(ERROR) << "Json exception at `" << e.GetAt()
-                 << "` while extracting an attachment: " << e.GetMessage();
+                 << "` while extracting an attachment: " << e.GetText();
     }
   }
 }
@@ -129,7 +129,7 @@ std::vector<Message> MessageAPI::GetMessages(uint64_t user_id,
     if (last_message_id != 0) {
       params.AddParameter(
           {"start_message_id", std::to_string(last_message_id)});
-      params.AddParameter({"offset", std::to_string(-count)});
+      params.AddParameter({"offset", std::to_string(-1*count)});
     } else {
       params.AddParameter({"rev", "1"});
       params.AddParameter({"offset", "0"});

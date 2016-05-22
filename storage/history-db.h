@@ -3,6 +3,18 @@
 #include <memory>
 #include "history.h"
 
+namespace history_check_path  {
+	struct ok;
+	struct file_exists;
+	struct unable_create_path;
+	struct get_storage;
+	struct get_user;
+}
+
+namespace testing {
+	class TestDB;
+}
+
 namespace storage {
 
 class HistoryDB {
@@ -19,5 +31,7 @@ class HistoryDB {
 
   void CheckPath() const;
   static void CheckFile(const std::string& file_name);
+
+  friend class testing::TestDB;
 };
 }

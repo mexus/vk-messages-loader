@@ -23,10 +23,10 @@ class IStreamWrapper {
 
   size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
-  Ch* PutBegin();
-  void Put(Ch);
+  Ch* PutBegin() { return nullptr; }
+  void Put(Ch) {}
   void Flush();
-  size_t PutEnd(Ch*);
+  size_t PutEnd(Ch*) { return 0; }
 
  private:
   std::istream& is_;

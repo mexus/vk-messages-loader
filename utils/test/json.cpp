@@ -1,8 +1,10 @@
 #define BOOST_TEST_MODULE utils
 #define BOOST_TEST_DYN_LINK
+
+#include <limits>
+
 #include <utils/json.h>
 #include <boost/test/unit_test.hpp>
-#include <limits>
 
 using namespace util;
 INITIALIZE_EASYLOGGINGPP

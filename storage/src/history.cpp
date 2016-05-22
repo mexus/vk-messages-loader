@@ -11,7 +11,7 @@ History::~History() {
     WriteData();
   } catch (const util::BasicException& e) {
     LOG(ERROR) << "Caught a basic exception at `" << e.GetAt() << "` "
-               << "while saving a history data: " << e.GetMessage();
+               << "while saving a history data: " << e.GetText();
   }
 }
 

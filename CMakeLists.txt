@@ -3,7 +3,7 @@ project("vk-message-loader")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_BUILD_TYPE Debug)
-SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
+#SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     SET(CMAKE_CXX_EXTRA_FLAGS "${CMAKE_CXX_EXTRA_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif()
@@ -12,11 +12,16 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_EXTRA_FLAGS}")
 include_directories("." "3rd-party/rapidjson/include")
 
 find_package(Boost COMPONENTS unit_test_framework system filesystem REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
 enable_testing()
 
 # Settings for "cpr":
-SET(ENV{USE_SYSTEM_CURL} ON)
+#SET(ENV{USE_SYSTEM_CURL} ON)
 SET(ENV{BUILD_CPR_TESTS} OFF)
+
+add_definitions(-DNOMINMAX)
 
 add_subdirectory("3rd-party/cpr")
 include_directories(${CPR_INCLUDE_DIRS})

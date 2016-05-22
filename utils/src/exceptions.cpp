@@ -10,7 +10,7 @@ BasicException::BasicException(const std::string& at,
 
 std::string BasicException::GetAt() const { return at_; }
 
-std::string BasicException::GetMessage() const { return message_; }
+std::string BasicException::GetText() const { return message_; }
 
 FileException::FileException(const std::string& at, Operation operation,
                              const std::string& file_name)

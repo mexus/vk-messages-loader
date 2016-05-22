@@ -54,7 +54,7 @@ void Settings::SaveToFile() const {
     util::JsonToFile(file_name_, doc);
   } catch (const util::BasicException& e) {
     LOG(ERROR) << "Caught an application exception at `" << e.GetAt() << "` "
-               << "while saving settings: " << e.GetMessage();
+               << "while saving settings: " << e.GetText();
   }
 }
 }

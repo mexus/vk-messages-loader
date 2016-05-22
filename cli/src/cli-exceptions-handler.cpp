@@ -144,7 +144,7 @@ void CliExceptionsHandler::Handle(const manager::cache::NoDataException& e) {
 
 void CliExceptionsHandler::Handle(const util::BasicException& e) {
   LOG(ERROR) << "At `" << e.GetAt() << "`: "
-             << "Received a basic application exception: " << e.GetMessage();
+             << "Received a basic application exception: " << e.GetText();
 }
 
 void CliExceptionsHandler::Handle(const std::runtime_error& e) {

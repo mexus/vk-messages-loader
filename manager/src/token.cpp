@@ -1,9 +1,11 @@
+#include <fstream>
+#include <iostream>
+
 #include <cpr.h>
+
 #include <manager/exceptions.h>
 #include <manager/token.h>
 #include <utils/json.h>
-#include <fstream>
-#include <iostream>
 
 namespace util {
 
@@ -36,7 +38,7 @@ Token::Token(const std::string& app_id, const std::string& file_name)
     LOG(ERROR) << "Can't load token data from " << e.GetFileName();
   } catch (const util::json::Exception& e) {
     LOG(ERROR) << "Json parsing of '" << file_name << "' failed at `"
-               << e.GetAt() << "`: " << e.GetMessage();
+               << e.GetAt() << "`: " << e.GetText();
   }
 }
 
@@ -54,7 +56,7 @@ void Token::SaveData() const {
     util::JsonToFile(file_name_, doc);
   } catch (const util::BasicException& e) {
     LOG(ERROR) << "Caught a basic exception at `" << e.GetAt() << "` "
-               << "while saving the data: " << e.GetMessage();
+               << "while saving the data: " << e.GetText();
   }
 }
 

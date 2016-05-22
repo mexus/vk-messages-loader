@@ -9,6 +9,8 @@
 #include "data-types.h"
 #include "requests-manager.h"
 
+#undef interface
+
 namespace vk_api {
 
 class CommunicationInterface {
