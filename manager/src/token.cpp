@@ -1,7 +1,7 @@
 #include <cpr.h>
 #include <manager/exceptions.h>
 #include <manager/token.h>
-#include <utils/json.h>
+#include <utils/json-members.h>
 #include <fstream>
 #include <iostream>
 
@@ -10,16 +10,16 @@ namespace util {
 template <>
 void JsonToObject<>(const rapidjson::Value& json,
                     manager::Token::Data* object) {
-  JsonGetMembers(json)("access_token", &object->access_token)(
-      "expire_at", &object->expire_at);
+  JsonMembers(json)("access_token", &object->access_token)("expire_at",
+                                                           &object->expire_at);
 }
 
 template <>
 rapidjson::Value JsonFromObject<>(const manager::Token::Data& object,
                                   JsonAllocator& allocator) {
   rapidjson::Value json(rapidjson::kObjectType);
-  JsonAddMembers(&json, allocator, "access_token", object.access_token,
-                 "expire_at", object.expire_at);
+  JsonMembers(json, allocator)("access_token", object.access_token)(
+      "expire_at", object.expire_at);
   return json;
 }
 }

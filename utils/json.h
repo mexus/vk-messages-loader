@@ -85,47 +85,6 @@ void JsonGetMember(const rapidjson::Value& json, const std::string& name,
   JsonToObject(it->value, object);
 }
 
-namespace json {
-class Optional {};
-}
-
-void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator);
-template <class T, class... Args>
-void JsonAddMembers(rapidjson::Value* json, JsonAllocator& allocator,
-                    const std::string& name, const T& value, Args&&... args) {
-  JsonAddMember(json, name, value, allocator);
-  JsonAddMembers(json, allocator, std::forward<Args>(args)...);
-}
-
-class JsonMembersGetter {
- public:
-  JsonMembersGetter(const rapidjson::Value& json);
-
-  const JsonMembersGetter& operator()() const;
-
-  template <class T>
-  const JsonMembersGetter& operator()(const std::string& name, T* value,
-                                   json::Optional /*optional*/) const {
-    try {
-      JsonGetMember(json_, name, value);
-    } catch (const json::Exception&) {
-      // Just skip it, it's optional after all
-    }
-    return *this;
-  }
-
-  template <class T>
-  const JsonMembersGetter& operator()(const std::string& name, T* value) const {
-    JsonGetMember(json_, name, value);
-    return *this;
-  }
-
- private:
-  const rapidjson::Value& json_;
-};
-
-JsonMembersGetter JsonGetMembers(const rapidjson::Value& json);
-
 rapidjson::Document JsonFromFile(const std::string& file_name);
 void JsonToFile(const std::string& file_name,
                 const rapidjson::Document& document);

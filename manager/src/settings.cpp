@@ -1,10 +1,11 @@
 #include <manager/settings.h>
+#include <utils/json-members.h>
 
 namespace util {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, manager::Settings* object) {
-  JsonGetMembers(json)("application_id", &object->application_id_)(
+  JsonMembers(json)("application_id", &object->application_id_)(
       "storage_path", &object->storage_path_)("users", &object->users_,
                                               util::json::Optional{});
 }
@@ -13,8 +14,8 @@ template <>
 rapidjson::Value JsonFromObject<>(const manager::Settings& object,
                                   JsonAllocator& allocator) {
   rapidjson::Value json(rapidjson::kObjectType);
-  JsonAddMembers(&json, allocator, "application_id", object.application_id_,
-                 "storage_path", object.storage_path_, "users", object.users_);
+  JsonMembers(json, allocator)("application_id", object.application_id_)(
+      "storage_path", object.storage_path_)("users", object.users_);
   return json;
 }
 }

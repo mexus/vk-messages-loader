@@ -15,7 +15,6 @@ void JsonToObject<>(const rapidjson::Value& json, VideoAttachment* video) {
   if (!res) {
     THROW_AT(json::NoFieldException, "photo_*");
   }
-  JsonGetMembers(json)("title", &video->title)("description",
-                                               &video->description);
+  JsonMembers(json)("title", &video->title)("description", &video->description);
 }
 }

@@ -62,7 +62,7 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
-  JsonGetMembers(json)("id", &object->id)("date", &object->date)(
+  JsonMembers(json)("id", &object->id)("date", &object->date)(
       "from_id", &object->from_id)("chat_id", &object->chat_id,
                                    json::Optional{})(
       "user_id", &object->user_id)("body", &object->body);
@@ -75,14 +75,15 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::MessageInfo* object) {
-  JsonGetMembers(json)("id", &object->id)("chat_id", &object->chat_id,
-                       json::Optional{})("user_id", &object->user_id);
+  JsonMembers(json)("id", &object->id)("chat_id", &object->chat_id,
+                                       json::Optional{})("user_id",
+                                                         &object->user_id);
 }
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json,
                     vk_api::WrappedMessageInfo* object) {
-  JsonGetMembers(json)("message", &object->info);
+  JsonMembers(json)("message", &object->info);
 }
 
 // These functions are needed to avoid linker errors

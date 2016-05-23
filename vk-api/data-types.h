@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/json.h>
+#include <utils/json-members.h>
 #include <cinttypes>
 #include <map>
 #include <vector>
@@ -48,6 +48,6 @@ namespace util {
 
 template <class T>
 void JsonToObject(const rapidjson::Value& json, vk_api::List<T>* list) {
-  JsonGetMembers(json)("count", &list->count)("items", &list->items);
+  JsonMembers(json)("count", &list->count)("items", &list->items);
 }
 }
