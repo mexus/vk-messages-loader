@@ -1,8 +1,9 @@
+#include <algorithm>
+#include <boost/filesystem.hpp>
+
 #include <manager/manager.h>
 #include <utils/exceptions.h>
 #include <vk-api/users.h>
-#include <algorithm>
-#include <boost/filesystem.hpp>
 
 namespace manager {
 
@@ -14,6 +15,7 @@ Manager::Manager(const std::shared_ptr<Settings>& settings,
       users_cache_(settings_->GetStoragePath() + "/users.cache"),
       dialogues_users_cache_(settings_->GetStoragePath() +
                              "/dialogues-users.cache"),
+      chats_cache_(settings_->GetStoragePath() + "/chats.cache"),
       history_export_(users_cache_) {
   try {
     users_cache_.Load();
@@ -25,6 +27,11 @@ Manager::Manager(const std::shared_ptr<Settings>& settings,
   } catch (const util::FileReadException& e) {
     LOG(WARNING) << "Can't load dialogues users cache from file "
                  << e.GetFileName();
+  }
+  try {
+    chats_cache_.Load();
+  } catch (const util::FileReadException& e) {
+    LOG(WARNING) << "Can't load chats cache from file " << e.GetFileName();
   }
   vk_api::UsersAPI users_api(&vk_interface_);
   auto user = users_api.GetUser();
@@ -41,20 +48,15 @@ void Manager::UpdateMessages() {
     auto history = history_db_.GetUser(user_id);
     uint64_t last_message_id = history->LastMessageId();
     auto messages = messages_api.GetMessages(user_id, last_message_id);
-    if (messages.empty()) {
-      continue;
-    }
-    for (auto& vk_message : messages) {
-      storage::Message storage_message{vk_message.id,
-                                       vk_message.date,
-                                       vk_message.from_id,
-                                       std::move(vk_message.body),
-                                       {}};
-      for (auto& attachment : vk_message.attachments) {
-        AddAttachment(attachment, &storage_message);
-      }
-      history->AddMessage(std::move(storage_message));
-    }
+    UpdateMessages(messages, history);
+  }
+  auto chats = settings_->GetChats();
+  for (auto& chat_id : chats) {
+    auto history = history_db_.GetChat(chat_id);
+    uint64_t last_message_id = history->LastMessageId();
+    auto messages =
+        messages_api.GetMessages(chat_id + 2000000000, last_message_id);
+    UpdateMessages(messages, history);
   }
   return;
 }
@@ -63,17 +65,25 @@ void Manager::UpdateDialoguesList() {
   vk_api::MessageAPI messages_api(&vk_interface_);
   vk_api::UsersAPI users_api(&vk_interface_);
   auto last_messages = messages_api.GetLastMessages();
-  std::vector<uint64_t> user_ids;
+  std::vector<uint64_t> user_ids, chat_ids;
   for (auto& msg : last_messages) {
-    user_ids.push_back(msg.user_id);
+    if (msg.chat_id == 0) {
+      user_ids.push_back(msg.user_id);
+    } else {
+      chat_ids.push_back(msg.chat_id);
+    }
   }
+
   auto users = users_api.GetUsers(user_ids);
-  for (auto& user : users) {
-    users_cache_.AddData(user);
-    dialogues_users_cache_.AddData(user);
-  }
+  users_cache_.AddData(users);
+  dialogues_users_cache_.AddData(users);
+
+  auto chats = messages_api.GetChats(chat_ids);
+  chats_cache_.AddData(chats);
+
   users_cache_.Save();
   dialogues_users_cache_.Save();
+  chats_cache_.Save();
 }
 
 std::vector<vk_api::User> Manager::GetDialoguesUsers() const {
@@ -138,6 +148,8 @@ void Manager::ExportHistory() {
 
 const cache::Users& Manager::GetUsersCache() const { return users_cache_; }
 
+const cache::Chats& Manager::GetChatsCache() const { return chats_cache_; }
+
 void Manager::AddAttachment(
     const std::unique_ptr<vk_api::Attachment>& attachment,
     storage::Message* storage_message) {
@@ -186,5 +198,20 @@ void Manager::AddAttachment(const vk_api::StickerAttachment* sticker,
                             storage::Message* storage_message) {
   storage::Attachment storage_attachment{storage::STICKER, sticker->url};
   storage_message->attachments.push_back(std::move(storage_attachment));
+}
+
+void Manager::UpdateMessages(const std::vector<vk_api::Message>& messages,
+                             const std::shared_ptr<storage::History>& history) {
+  for (auto& vk_message : messages) {
+    storage::Message storage_message{vk_message.id,
+                                     vk_message.date,
+                                     vk_message.from_id,
+                                     std::move(vk_message.body),
+                                     {}};
+    for (auto& attachment : vk_message.attachments) {
+      AddAttachment(attachment, &storage_message);
+    }
+    history->AddMessage(std::move(storage_message));
+  }
 }
 }

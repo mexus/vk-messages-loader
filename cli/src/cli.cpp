@@ -33,6 +33,13 @@ void CommandLineInterface::PrintUsers(const std::vector<vk_api::User>& users) {
   }
 }
 
+void CommandLineInterface::PrintChats(const std::vector<vk_api::Chat>& chats) {
+  size_t i = 0;
+  for (auto& chat : chats) {
+    std::cout << ++i << ". " << chat.title << "\n";
+  }
+}
+
 void CommandLineInterface::PrintActiveUsers() const {
   auto& users_cache = manager_.GetUsersCache();
   auto active_users = manager_.GetActiveUsers();
@@ -43,6 +50,21 @@ void CommandLineInterface::PrintActiveUsers() const {
       std::cout << " (" << user.first_name << " " << user.last_name << ")";
     } catch (const manager::cache::NoDataException&) {
       // No user, no name conversion, fair enough
+    }
+    std::cout << "\n";
+  }
+}
+
+void CommandLineInterface::PrintActiveChats() const {
+  auto chats_cache = manager_.GetChatsCache();
+  auto active_chats = manager_.GetActiveChats();
+  for (uint64_t chat_id : active_chats) {
+    std::cout << "    Id " << chat_id;
+    try {
+      auto chat = chats_cache.GetData(chat_id);
+      std::cout << " `" << chat.title << "`";
+    } catch (const manager::cache::NoDataException&) {
+      // No chat, no title, fair enough
     }
     std::cout << "\n";
   }
@@ -61,12 +83,29 @@ void CommandLineInterface::AddActiveUser(
   manager_.AddActiveUser(friends[index - 1].user_id);
 }
 
+void CommandLineInterface::AddActiveChat(
+    const std::vector<vk_api::Chat>& chats) {
+  std::cout << "Enter a chat's number from the list above (the first one, not "
+               "`id`): ";
+  size_t index;
+  std::cin >> index;
+  if (index > chats.size() || index == 0) {
+    std::cout << "Unknown chat\n";
+    return;
+  }
+  manager_.AddActiveChat(chats[index - 1].chat_id);
+}
+
 void CommandLineInterface::Execute() {
   if (InputYesOrNo("Update dialogues list?")) {
     manager_.UpdateDialoguesList();
   }
   auto active_friends = manager_.GetActiveUsers();
   auto dialogues_users = manager_.GetDialoguesUsers();
+
+  auto active_chats = manager_.GetActiveChats();
+  auto all_chats = manager_.GetChatsCache().GetDataAsVector();
+
   std::cout << "Friends to fetch message history:\n";
   PrintActiveUsers();
   if (InputYesOrNo("Print dialogues list?")) {
@@ -76,6 +115,17 @@ void CommandLineInterface::Execute() {
     }
     PrintActiveUsers();
   }
+
+  std::cout << "Chats to fetch message history:\n";
+  PrintActiveChats();
+  if (InputYesOrNo("Print chat list?")) {
+    PrintChats(all_chats);
+    while (InputYesOrNo("Add a chat to fetch message history?")) {
+      AddActiveChat(all_chats);
+    }
+    PrintActiveChats();
+  }
+
   if (InputYesOrNo("Update messages database?")) {
     manager_.UpdateMessages();
   }

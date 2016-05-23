@@ -19,6 +19,8 @@ class MessageAPI {
                                    uint64_t count = 0) const;
   std::vector<MessageInfo> GetLastMessages() const;
 
+  std::vector<Chat> GetChats(const std::vector<uint64_t>& chat_ids) const;
+
  private:
   static const std::string kInterfaceName;
   CommunicationInterface* const vk_interface_;

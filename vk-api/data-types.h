@@ -25,6 +25,11 @@ struct Message {
   std::vector<std::unique_ptr<Attachment>> attachments;
 };
 
+struct Chat {
+  uint64_t chat_id;
+  std::string title;
+};
+
 template <class T>
 struct List {
   uint64_t count;

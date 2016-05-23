@@ -1,4 +1,5 @@
 add_library("manager"
+            "src/chats-cache.cpp"
             "src/exceptions.cpp"
             "src/history-export.cpp"
             "src/manager.cpp"

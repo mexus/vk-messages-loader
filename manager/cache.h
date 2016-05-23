@@ -40,6 +40,11 @@ class MappedCache {
     data_[id] = data;
   }
 
+  void AddData(const std::vector<T>& data_list) {
+    std::for_each(data_list.begin(), data_list.end(),
+                  [this](const T& data) { AddData(data); });
+  }
+
   T GetData(uint64_t id) const {
     auto it = data_.find(id);
     if (it == data_.end()) {

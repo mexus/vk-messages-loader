@@ -62,6 +62,7 @@ void ParseAttachments(const rapidjson::Value& json, Attachments* attachments) {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
+  object->chat_id = 0;
   JsonMembers(json)("id", &object->id)("date", &object->date)(
       "from_id", &object->from_id)("chat_id", &object->chat_id,
                                    json::Optional{})(
@@ -75,6 +76,7 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
 
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::MessageInfo* object) {
+  object->chat_id = 0;
   JsonMembers(json)("id", &object->id)("chat_id", &object->chat_id,
                                        json::Optional{})("user_id",
                                                          &object->user_id);
@@ -84,6 +86,19 @@ template <>
 void JsonToObject<>(const rapidjson::Value& json,
                     vk_api::WrappedMessageInfo* object) {
   JsonMembers(json)("message", &object->info);
+}
+
+template <>
+void JsonToObject<>(const rapidjson::Value& json, vk_api::Chat* object) {
+  JsonMembers(json)("id", &object->chat_id)("title", &object->title);
+}
+
+template <>
+rapidjson::Value JsonFromObject(const vk_api::Chat& object,
+                                JsonAllocator& allocator) {
+  rapidjson::Value json(rapidjson::kObjectType);
+  JsonMembers(json, allocator)("id", object.chat_id)("title", object.title);
+  return json;
 }
 
 // These functions are needed to avoid linker errors
@@ -218,5 +233,37 @@ std::vector<MessageInfo> MessageAPI::GetLastMessages() const {
     }
   }
   return all_messages;
+}
+
+std::vector<Chat> MessageAPI::GetChats(
+    const std::vector<uint64_t>& chat_ids) const {
+  if (chat_ids.empty()) {
+    return {};
+  }
+  std::string ids_string;
+  for (auto id : chat_ids) {
+    ids_string += std::to_string(id) + ",";
+  }
+  ids_string.resize(ids_string.size() - 1);
+
+  cpr::Parameters params{{"chat_ids", ids_string}};
+  rapidjson::Document doc;
+  try {
+    auto reply = vk_interface_->SendRequest(kInterfaceName, "getChat", params);
+    doc = std::move(reply);
+  } catch (const util::BasicException& e) {
+    LOG(ERROR) << "Caught an exception during a request: " << e.what();
+    return {};
+  }
+  std::vector<Chat> response;
+  try {
+    util::JsonGetMember(doc, "response", &response);
+  } catch (const util::json::Exception& e) {
+    LOG(ERROR) << "Unable to convert a response to a list of wrapped messages: "
+               << e.what();
+    return {};
+  }
+
+  return response;
 }
 }
