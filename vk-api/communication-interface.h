@@ -9,7 +9,9 @@
 #include "data-types.h"
 #include "requests-manager.h"
 
+#ifdef interface
 #undef interface
+#endif
 
 namespace vk_api {
 

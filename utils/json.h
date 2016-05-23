@@ -105,7 +105,7 @@ class JsonMembersGetter {
 
   template <class T>
   const JsonMembersGetter& operator()(const std::string& name, T* value,
-                                   json::Optional /*optional*/) const {
+                                      json::Optional /*optional*/) const {
     try {
       JsonGetMember(json_, name, value);
     } catch (const json::Exception&) {

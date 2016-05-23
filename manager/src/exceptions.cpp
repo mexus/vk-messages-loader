@@ -11,7 +11,6 @@ NoTokenException::NoTokenException(const std::string& at)
 
 namespace cache {
 
-
 NoDataException::NoDataException(const std::string& at, uint64_t id)
     : util::BasicException(at, "No data for id " + std::to_string(id)),
       id_(id) {}

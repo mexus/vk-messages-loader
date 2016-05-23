@@ -51,16 +51,17 @@ class OStreamWrapper {
 
 void JsonAddMembers(rapidjson::Value* /*json*/, JsonAllocator& /*allocator*/) {}
 
-JsonMembersGetter::JsonMembersGetter(const rapidjson::Value& json) : json_(json) {
-    if (!json.IsObject()) {
-        THROW_AT(json::NotAnObjectException);
-    }
+JsonMembersGetter::JsonMembersGetter(const rapidjson::Value& json)
+    : json_(json) {
+  if (!json.IsObject()) {
+    THROW_AT(json::NotAnObjectException);
+  }
 }
 
 const JsonMembersGetter& JsonMembersGetter::operator()() const { return *this; }
 
 JsonMembersGetter JsonGetMembers(const rapidjson::Value& json) {
-    return JsonMembersGetter(json);
+  return JsonMembersGetter(json);
 }
 
 template <>

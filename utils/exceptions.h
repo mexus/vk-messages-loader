@@ -1,8 +1,14 @@
 #pragma once
 #include <stdexcept>
 
-// #define __PRETTY_FUNCTION__ __FILE__ "::" __LINE__
-#define THROW_AT(E, ...) throw E(std::string(__FILE__) + std::string("::") + std::to_string(__LINE__), ##__VA_ARGS__)
+#ifdef _MSC_VER
+#define THROW_AT(E, ...)                                                    \
+  throw E(                                                                  \
+      std::string(__FILE__) + std::string("::") + std::to_string(__LINE__), \
+      ##__VA_ARGS__)
+#else
+#define THROW_AT(E, ...) throw E(__PRETTY_FUNCTION__, ##__VA_ARGS__)
+#endif
 
 namespace util {
 

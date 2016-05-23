@@ -1,32 +1,32 @@
 #define BOOST_TEST_MODULE history storage
 #define BOOST_TEST_DYN_LINK
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/test/unit_test.hpp>
+
 #include <fstream>
 #include <iostream>
 
-#include <storage/history-db.h>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/test/unit_test.hpp>
+
 #include <storage/exceptions.h>
+#include <storage/history-db.h>
 
 INITIALIZE_EASYLOGGINGPP
 
 namespace testing {
-	class TestDB {
-	public:
-		TestDB(storage::HistoryDB& db) : db_(db) {}
+class TestDB {
+ public:
+  TestDB(storage::HistoryDB& db) : db_(db) {}
 
-		void CheckPath() {
-			db_.CheckPath();
-		}
+  void CheckPath() { db_.CheckPath(); }
 
-		std::shared_ptr<storage::History> GetStorage(uint64_t user_id) {
-			return db_.GetStorage(user_id);
-		}
+  std::shared_ptr<storage::History> GetStorage(uint64_t user_id) {
+    return db_.GetStorage(user_id);
+  }
 
-	private:
-		storage::HistoryDB& db_;
-	};
+ private:
+  storage::HistoryDB& db_;
+};
 }
 
 namespace {
@@ -49,7 +49,6 @@ struct Dir {
 
   const boost::filesystem::path path;
 };
-
 
 struct File {
   File() : path("temp-file") {
@@ -93,7 +92,7 @@ BOOST_AUTO_TEST_CASE(unable_create_path) {
   HistoryDB storage(path);
   using exception = boost::filesystem::filesystem_error;
   BOOST_CHECK_EXCEPTION(
-	  TestDB(storage).CheckPath(), exception,
+      TestDB(storage).CheckPath(), exception,
       [&path](const exception& e) { return e.path1().string() == path; });
 }
 

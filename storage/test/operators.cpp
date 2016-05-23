@@ -14,8 +14,7 @@ bool operator!=(const Message& lhs, const Message& rhs) {
 bool operator==(const Message& lhs, const Message& rhs) {
   return lhs.from_user_id == rhs.from_user_id &&
          lhs.attachments == rhs.attachments && lhs.date == rhs.date &&
-         lhs.message_id == rhs.message_id &&
-         lhs.body == rhs.body;
+         lhs.message_id == rhs.message_id && lhs.body == rhs.body;
 }
 }
 

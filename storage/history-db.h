@@ -3,16 +3,8 @@
 #include <memory>
 #include "history.h"
 
-namespace history_check_path  {
-	struct ok;
-	struct file_exists;
-	struct unable_create_path;
-	struct get_storage;
-	struct get_user;
-}
-
 namespace testing {
-	class TestDB;
+class TestDB;
 }
 
 namespace storage {

@@ -3,10 +3,15 @@ project("vk-message-loader")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_BUILD_TYPE Debug)
-#SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
+
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    SET(CMAKE_CXX_EXTRA_FLAGS "-Wall -Wextra -Werror")
+endif()
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     SET(CMAKE_CXX_EXTRA_FLAGS "${CMAKE_CXX_EXTRA_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif()
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_EXTRA_FLAGS}")
 
 include_directories("." "3rd-party/rapidjson/include")
@@ -21,7 +26,9 @@ enable_testing()
 SET(ENV{USE_SYSTEM_CURL} ON)
 SET(ENV{BUILD_CPR_TESTS} OFF)
 
-add_definitions(-DNOMINMAX -DCURL_STATICLIB -DINSECURE_CURL)
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+    add_definitions(-DNOMINMAX -DCURL_STATICLIB -DINSECURE_CURL)
+endif()
 
 add_subdirectory("3rd-party/cpr")
 include_directories(${CPR_INCLUDE_DIRS})

@@ -76,7 +76,8 @@ void JsonToObject<>(const rapidjson::Value& json, vk_api::Message* object) {
 template <>
 void JsonToObject<>(const rapidjson::Value& json, vk_api::MessageInfo* object) {
   JsonGetMembers(json)("id", &object->id)("chat_id", &object->chat_id,
-                       json::Optional{})("user_id", &object->user_id);
+                                          json::Optional{})("user_id",
+                                                            &object->user_id);
 }
 
 template <>
@@ -129,7 +130,7 @@ std::vector<Message> MessageAPI::GetMessages(uint64_t user_id,
     if (last_message_id != 0) {
       params.AddParameter(
           {"start_message_id", std::to_string(last_message_id)});
-      params.AddParameter({"offset", std::to_string(-1*count)});
+      params.AddParameter({"offset", std::to_string(-1 * count)});
     } else {
       params.AddParameter({"rev", "1"});
       params.AddParameter({"offset", "0"});
