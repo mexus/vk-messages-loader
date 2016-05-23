@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 // #define __PRETTY_FUNCTION__ __FILE__ "::" __LINE__
-#define THROW_AT(E, ...) throw E("::", ##__VA_ARGS__)
+#define THROW_AT(E, ...) throw E(std::string(__FILE__) + std::string("::") + std::to_string(__LINE__), ##__VA_ARGS__)
 
 namespace util {
 

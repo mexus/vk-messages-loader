@@ -18,10 +18,10 @@ link_directories(${Boost_LIBRARY_DIRS})
 enable_testing()
 
 # Settings for "cpr":
-#SET(ENV{USE_SYSTEM_CURL} ON)
+SET(ENV{USE_SYSTEM_CURL} ON)
 SET(ENV{BUILD_CPR_TESTS} OFF)
 
-add_definitions(-DNOMINMAX)
+add_definitions(-DNOMINMAX -DCURL_STATICLIB -DINSECURE_CURL)
 
 add_subdirectory("3rd-party/cpr")
 include_directories(${CPR_INCLUDE_DIRS})
