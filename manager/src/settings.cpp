@@ -7,7 +7,8 @@ template <>
 void JsonToObject<>(const rapidjson::Value& json, manager::Settings* object) {
   JsonMembers(json)("application_id", &object->application_id_)(
       "storage_path", &object->storage_path_)("users", &object->users_,
-                                              util::json::Optional{});
+                                              util::json::Optional{})(
+      "chats", &object->chats_, util::json::Optional{});
 }
 
 template <>
@@ -15,7 +16,8 @@ rapidjson::Value JsonFromObject<>(const manager::Settings& object,
                                   JsonAllocator& allocator) {
   rapidjson::Value json(rapidjson::kObjectType);
   JsonMembers(json, allocator)("application_id", object.application_id_)(
-      "storage_path", object.storage_path_)("users", object.users_);
+      "storage_path", object.storage_path_)("users", object.users_)(
+      "chats", object.chats_);
   return json;
 }
 }
